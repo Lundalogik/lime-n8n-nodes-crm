@@ -1,0 +1,55 @@
+{
+	"name": "@limetech/n8n-nodes-lime-crm",
+	"version": "0.1.0",
+	"description": "n8n community node for Lime CRM — work with objects, files and users, and trigger workflows on CRM events",
+	"license": "MIT",
+	"homepage": "https://www.lime-technologies.com",
+	"keywords": [
+		"n8n-community-node-package",
+		"lime-crm",
+		"lime-technologies",
+		"lundalogik",
+		"crm"
+	],
+	"author": {
+		"name": "Lime Technologies",
+		"url": "https://www.lime-technologies.com"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/Lundalogik/lime-n8n-nodes-crm.git"
+	},
+	"scripts": {
+		"build": "n8n-node build",
+		"build:watch": "tsc --watch",
+		"dev": "n8n-node dev",
+		"lint": "n8n-node lint",
+		"lint:fix": "n8n-node lint --fix",
+		"release": "n8n-node release",
+		"prepublishOnly": "n8n-node prerelease"
+	},
+	"files": [
+		"dist"
+	],
+	"n8n": {
+		"n8nNodesApiVersion": 1,
+		"strict": true,
+		"credentials": [
+			"dist/credentials/LimeCrmApi.credentials.js"
+		],
+		"nodes": [
+			"dist/nodes/LimeCrm/LimeCrm.node.js",
+			"dist/nodes/LimeCrmTrigger/LimeCrmTrigger.node.js"
+		]
+	},
+	"devDependencies": {
+		"@n8n/node-cli": "^0.46.2",
+		"eslint": "9.32.0",
+		"prettier": "3.6.2",
+		"release-it": "^19.0.4",
+		"typescript": "5.9.2"
+	},
+	"peerDependencies": {
+		"n8n-workflow": "*"
+	}
+}
