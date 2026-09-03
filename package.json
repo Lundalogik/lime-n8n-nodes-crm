@@ -27,7 +27,6 @@
 		"lint:fix": "n8n-node lint --fix",
 		"format": "prettier --check .",
 		"format:fix": "prettier --write .",
-		"release": "n8n-node release",
 		"prepublishOnly": "n8n-node prerelease"
 	},
 	"files": [
