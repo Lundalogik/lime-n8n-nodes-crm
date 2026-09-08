@@ -89,17 +89,17 @@ export function getBulkImportProperties(
 			displayName: 'Matching Property Name or ID',
 			name: 'matchingProperty',
 			type: 'options',
-			description:
-				'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
 			typeOptions: {
 				loadOptionsMethod: 'getNoHasManyProperties',
 				loadOptionsDependsOn: ['limetype.value'],
 			},
 			required: matchingPropertyRequired,
 			default: '',
-			description: matchingPropertyRequired
-				? 'The property to use to match existing objects. Must be a unique property.'
-				: 'Optional: The property to use to match existing objects. If set, objects matching an existing record will be skipped.',
+			description:
+				'The property to use to match existing objects. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
+			hint: matchingPropertyRequired
+				? 'Must be a unique property'
+				: 'Optional: if set, objects matching an existing record will be skipped',
 			displayOptions: {
 				show: {
 					resource: [DATA_RESOURCE],
