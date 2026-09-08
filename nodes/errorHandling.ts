@@ -3,9 +3,7 @@ import { NodeApiError, NodeOperationError, JsonObject, INode } from 'n8n-workflo
 /**
  * Wrapper for the error data used in Lime workflows
  */
-export type WorkflowErrorContext = {
-	message: string;
-} & JsonObject;
+export type WorkflowErrorContext = Omit<Error, 'name'> & JsonObject;
 
 /**
  * Structure for unsuccessful response used in communication layer.
@@ -39,5 +37,5 @@ export function handleWorkflowError(
 	} else if (isApiError) {
 		throw new NodeApiError(node, errorContext);
 	}
-	throw new NodeOperationError(node, errorContext.message);
+	throw new NodeOperationError(node, errorContext);
 }

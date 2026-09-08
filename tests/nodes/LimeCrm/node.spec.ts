@@ -425,9 +425,7 @@ describe('LimeCrm execute — bulk import operations', () => {
 		['bulkUpdateManyObjects', 'update'],
 		['bulkCreateOrUpdateManyObjects', 'create_or_update'],
 	])('%s creates a job in "%s" mode', async (operation, mode) => {
-		transportMock.createBulkImportJob.mockResolvedValue({
-			id: 'job1',
-		} as never);
+		transportMock.createBulkImportJob.mockResolvedValue(ok({ id: 'job1' }) as never);
 		transportMock.waitForBulkImportJob.mockResolvedValue(completedJob as never);
 		const ctx = makeBulkContext(operation, { matchingProperty: 'email' });
 
@@ -442,9 +440,7 @@ describe('LimeCrm execute — bulk import operations', () => {
 	});
 
 	it('runs a single job for the whole input batch and returns one summary item', async () => {
-		transportMock.createBulkImportJob.mockResolvedValue({
-			id: 'job1',
-		} as never);
+		transportMock.createBulkImportJob.mockResolvedValue(ok({ id: 'job1' }) as never);
 		transportMock.waitForBulkImportJob.mockResolvedValue(completedJob as never);
 		const ctx = makeBulkContext('bulkCreateManyObjects');
 
@@ -471,9 +467,7 @@ describe('LimeCrm execute — bulk import operations', () => {
 	});
 
 	it('omits an empty matching property from the job payload', async () => {
-		transportMock.createBulkImportJob.mockResolvedValue({
-			id: 'job1',
-		} as never);
+		transportMock.createBulkImportJob.mockResolvedValue(ok({ id: 'job1' }) as never);
 		transportMock.waitForBulkImportJob.mockResolvedValue(completedJob as never);
 		const ctx = makeBulkContext('bulkCreateManyObjects');
 
@@ -484,9 +478,7 @@ describe('LimeCrm execute — bulk import operations', () => {
 	});
 
 	it('throws when the bulk import job fails', async () => {
-		transportMock.createBulkImportJob.mockResolvedValue({
-			id: 'job1',
-		} as never);
+		transportMock.createBulkImportJob.mockResolvedValue(ok({ id: 'job1' }) as never);
 		transportMock.waitForBulkImportJob.mockResolvedValue({
 			status: 'failed',
 		} as never);
@@ -496,9 +488,7 @@ describe('LimeCrm execute — bulk import operations', () => {
 	});
 
 	it('wraps every entry of a top-level array and reads the field once', async () => {
-		transportMock.createBulkImportJob.mockResolvedValue({
-			id: 'job1',
-		} as never);
+		transportMock.createBulkImportJob.mockResolvedValue(ok({ id: 'job1' }) as never);
 		transportMock.waitForBulkImportJob.mockResolvedValue(completedJob as never);
 		const ctx = makeBulkContext('bulkCreateManyObjects', {
 			limetype: 'company',
@@ -522,9 +512,7 @@ describe('LimeCrm execute — bulk import operations', () => {
 	});
 
 	it('imports every input item in form mode', async () => {
-		transportMock.createBulkImportJob.mockResolvedValue({
-			id: 'job1',
-		} as never);
+		transportMock.createBulkImportJob.mockResolvedValue(ok({ id: 'job1' }) as never);
 		transportMock.waitForBulkImportJob.mockResolvedValue(completedJob as never);
 		const ctx = makeBulkContext('bulkCreateManyObjects', {
 			inputMethod: 'fields',

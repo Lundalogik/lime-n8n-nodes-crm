@@ -30,6 +30,7 @@ import {
 	getRelationLookupMappingColumns,
 	getRelationPropertiesWithLookupField,
 } from './methods';
+import { handleWorkflowError } from '../errorHandling';
 
 /**
  * Representation of a function that executes a specific Lime CRM operation.
@@ -210,7 +211,7 @@ export class LimeCrm implements INodeType {
 					returnData.push({ json: {}, error: error.message });
 					continue;
 				}
-				throw error;
+				throw handleWorkflowError(this.getNode(), error);
 			}
 		}
 
