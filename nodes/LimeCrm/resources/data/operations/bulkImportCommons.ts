@@ -253,7 +253,7 @@ function getBody(
 
 	const first = parseJsonParam(context, 0);
 	if (Array.isArray(first)) {
-		return first.map((element, _) => toPayloadObject(context, element));
+		return first.map((element) => toPayloadObject(context, element));
 	}
 
 	return Array.from({ length: itemCount }, (_, idx) =>
