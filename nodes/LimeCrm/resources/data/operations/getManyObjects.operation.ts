@@ -217,11 +217,9 @@ export const properties: INodeProperties[] = [
 		typeOptions: {
 			minValue: 1,
 		},
-		description: 'Max number of results to return',
 		default: 50,
-		description:
-			'The maximum number of objects to return. Leaving an empty input or specifying "0" will return ' +
-			'all objects.',
+		description: 'Max number of results to return',
+		hint: 'Leave the input empty to return all objects',
 		displayOptions: {
 			show: {
 				resource: [DATA_RESOURCE],
