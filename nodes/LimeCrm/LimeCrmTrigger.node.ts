@@ -57,6 +57,7 @@ export class LimeCrmTrigger implements INodeType {
 			'https://platform.docs.lime-crm.com/en/latest/workflows-and-integrations/node-reference/',
 		icon: 'file:assets/lime-crm.svg',
 		group: ['trigger'],
+		subtitle: 'On Lime CRM event',
 		version: 1,
 		description:
 			'Trigger which handles webhooks coming from Lime, e.g when ' + 'an object is updated',
