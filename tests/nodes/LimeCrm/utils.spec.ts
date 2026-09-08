@@ -17,6 +17,7 @@ jest.mock('../../../nodes/LimeCrm/transport', () => ({
 	getTasks: jest.fn(),
 }));
 
+import { IBinaryData, IExecuteFunctions } from 'n8n-workflow';
 import {
 	createFile,
 	getFileContent,
@@ -35,10 +36,14 @@ import {
 describe('files', () => {
 	describe('setFilename', () => {
 		it('returns responseFileName if fileName is missing', () => {
-			expect(setFilename({ fileExtension: 'jpg' } as any, 'default.jpg')).toBe('default.jpg');
+			expect(setFilename({ fileExtension: 'jpg' } as IBinaryData, 'default.jpg')).toBe(
+				'default.jpg',
+			);
 		});
 		it('returns existing fileName if present', () => {
-			expect(setFilename({ fileName: 'aspen.jpg' } as any, 'default.jpg')).toBe('aspen.jpg');
+			expect(setFilename({ fileName: 'aspen.jpg' } as IBinaryData, 'default.jpg')).toBe(
+				'aspen.jpg',
+			);
 		});
 	});
 
@@ -108,20 +113,17 @@ describe('files', () => {
 	});
 
 	describe('setFileProperties', () => {
-		const mockContext: any = {
-			helpers: {
-				assertBinaryData: jest.fn(),
-			},
-		};
+		const assertBinaryData = jest.fn();
+		const mockContext = { helpers: { assertBinaryData } } as unknown as IExecuteFunctions;
 		const mockBinaryData = { data: 'some binary data' };
 
 		beforeEach(() => {
 			(createFile as jest.Mock).mockClear();
-			mockContext.helpers.assertBinaryData.mockClear();
+			assertBinaryData.mockClear();
 		});
 
 		it('sets file properties successfully', async () => {
-			mockContext.helpers.assertBinaryData.mockReturnValue(mockBinaryData);
+			assertBinaryData.mockReturnValue(mockBinaryData);
 
 			const definedProperties = { document: 'some binary data' };
 			const result = await setFileProperties(
@@ -137,7 +139,7 @@ describe('files', () => {
 		});
 
 		it('sets file ID if assertBinaryData throws an error', async () => {
-			mockContext.helpers.assertBinaryData.mockImplementation(() => {
+			assertBinaryData.mockImplementation(() => {
 				throw new Error('Invalid binary data');
 			});
 			const definedProperties = { document: 2 };
@@ -155,7 +157,7 @@ describe('files', () => {
 	});
 
 	describe('processFileResponse', () => {
-		const mockNodeContext = {};
+		const mockNodeContext = {} as IExecuteFunctions;
 
 		beforeEach(() => {
 			(getFileMetadata as jest.Mock).mockClear();
@@ -165,7 +167,7 @@ describe('files', () => {
 		it('returns file metadata without file content', async () => {
 			const data = { document: 1 };
 			const result = await processFileResponse<{ document: number }>(
-				mockNodeContext as any,
+				mockNodeContext,
 				new Set(['document']),
 				data,
 			);
@@ -182,7 +184,7 @@ describe('files', () => {
 		it('returns file metadata with file content', async () => {
 			const data = { document: 1 };
 			const result = await processFileResponse<{ document: number }>(
-				mockNodeContext as any,
+				mockNodeContext,
 				new Set(['document']),
 				data,
 				true,
