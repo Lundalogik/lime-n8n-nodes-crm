@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { IExecuteFunctions, LoggerProxy as Logger, NodeApiError, sleep } from 'n8n-workflow';
 import { callLimeApi } from './commons';
+import { toNodeError } from '../../errorHandling';
 
 /**
  * Endpoint path for Lime CRM bulk import API.
@@ -144,7 +145,7 @@ export async function createBulkImportJob(
 		Logger.error(
 			`Failed to create bulk import job at ${BULK_IMPORT_URL} with payload: ${JSON.stringify(payload)}`,
 		);
-		throw error;
+		throw toNodeError(context.getNode(), error);
 	}
 }
 
