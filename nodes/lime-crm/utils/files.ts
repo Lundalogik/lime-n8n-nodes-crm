@@ -1,9 +1,4 @@
-import {
-    IBinaryData,
-    IDataObject,
-    IExecuteFunctions,
-    LoggerProxy as Logger,
-} from 'n8n-workflow';
+import { IBinaryData, IDataObject, IExecuteFunctions, LoggerProxy as Logger } from 'n8n-workflow';
 import { createFile, getFileContent, getFileMetadata } from '../transport';
 import { APIResponse, FileAPIResponse } from '../../response';
 import { LimetypeProperty } from '../models';
@@ -18,15 +13,12 @@ import { LimetypeProperty } from '../models';
  * @public
  * @group Utils
  */
-export const setFilename = (
-    preparedBinaryData: IBinaryData,
-    responseFileName: string
-) => {
-    if (!preparedBinaryData.fileName && preparedBinaryData.fileExtension) {
-        return responseFileName;
-    }
+export const setFilename = (preparedBinaryData: IBinaryData, responseFileName: string) => {
+	if (!preparedBinaryData.fileName && preparedBinaryData.fileExtension) {
+		return responseFileName;
+	}
 
-    return preparedBinaryData.fileName;
+	return preparedBinaryData.fileName;
 };
 
 /**
@@ -40,38 +32,32 @@ export const setFilename = (
  * @group Utils
  */
 export function getFilenameFromHeader(
-    headers: Record<string, string | string[] | undefined>
+	headers: Record<string, string | string[] | undefined>,
 ): string | null {
-    let contentDisposition =
-        headers['content-disposition'] || headers['Content-Disposition'];
-    if (!contentDisposition) return null;
+	let contentDisposition = headers['content-disposition'] || headers['Content-Disposition'];
+	if (!contentDisposition) return null;
 
-    if (Array.isArray(contentDisposition)) {
-        contentDisposition = contentDisposition[0];
-    }
+	if (Array.isArray(contentDisposition)) {
+		contentDisposition = contentDisposition[0];
+	}
 
-    // Try RFC 5987 filename* format
-    const filenameStarMatch = /filename\*\s*=\s*UTF-8''([^;]+)/i.exec(
-        contentDisposition
-    );
-    if (filenameStarMatch) {
-        try {
-            return decodeURIComponent(filenameStarMatch[1]);
-        } catch {
-            return filenameStarMatch[1];
-        }
-    }
+	// Try RFC 5987 filename* format
+	const filenameStarMatch = /filename\*\s*=\s*UTF-8''([^;]+)/i.exec(contentDisposition);
+	if (filenameStarMatch) {
+		try {
+			return decodeURIComponent(filenameStarMatch[1]);
+		} catch {
+			return filenameStarMatch[1];
+		}
+	}
 
-    // Try regular filename="..." or filename=...
-    const filenameMatch =
-        /filename\s*=\s*"([^"]+)"|filename\s*=\s*([^;]+)/i.exec(
-            contentDisposition
-        );
-    if (filenameMatch) {
-        return filenameMatch[1] || filenameMatch[2];
-    }
+	// Try regular filename="..." or filename=...
+	const filenameMatch = /filename\s*=\s*"([^"]+)"|filename\s*=\s*([^;]+)/i.exec(contentDisposition);
+	if (filenameMatch) {
+		return filenameMatch[1] || filenameMatch[2];
+	}
 
-    return null;
+	return null;
 }
 
 /**
@@ -86,18 +72,17 @@ export function getFilenameFromHeader(
  * @group Utils
  */
 export function getFilePropertiesNames(
-    properties: LimetypeProperty[],
-    allowedProperties?: Set<string>
+	properties: LimetypeProperty[],
+	allowedProperties?: Set<string>,
 ): Set<string> {
-    return new Set(
-        properties
-            .filter(
-                (property) =>
-                    property.type === 'file' &&
-                    (!allowedProperties || allowedProperties.has(property.name))
-            )
-            .map((property) => property.name)
-    );
+	return new Set(
+		properties
+			.filter(
+				(property) =>
+					property.type === 'file' && (!allowedProperties || allowedProperties.has(property.name)),
+			)
+			.map((property) => property.name),
+	);
 }
 
 /**
@@ -117,43 +102,40 @@ export function getFilePropertiesNames(
  * @group Utils
  */
 export async function setFileProperties(
-    context: IExecuteFunctions,
-    i: number,
-    fileProperties: Set<string>,
-    definedProperties: IDataObject
+	context: IExecuteFunctions,
+	i: number,
+	fileProperties: Set<string>,
+	definedProperties: IDataObject,
 ): Promise<APIResponse<IDataObject>> {
-    for (const fileProperty of fileProperties) {
-        if (!(fileProperty in definedProperties)) continue;
-        let binaryData: IBinaryData;
-        try {
-            Logger.info(
-                `Checking whether "${definedProperties[fileProperty]}" is a valid binary object for property "${fileProperty}"...`
-            );
-            binaryData = context.helpers.assertBinaryData(
-                i,
-                definedProperties[fileProperty] as string
-            );
-        } catch {
-            Logger.info(
-                `Invalid or missing binary data for "${fileProperty}". Using original value instead.`
-            );
-            continue;
-        }
+	for (const fileProperty of fileProperties) {
+		if (!(fileProperty in definedProperties)) continue;
+		let binaryData: IBinaryData;
+		try {
+			Logger.info(
+				`Checking whether "${definedProperties[fileProperty]}" is a valid binary object for property "${fileProperty}"...`,
+			);
+			binaryData = context.helpers.assertBinaryData(i, definedProperties[fileProperty] as string);
+		} catch {
+			Logger.info(
+				`Invalid or missing binary data for "${fileProperty}". Using original value instead.`,
+			);
+			continue;
+		}
 
-        const response = await createFile(
-            context,
-            binaryData,
-            definedProperties[fileProperty] as string
-        );
+		const response = await createFile(
+			context,
+			binaryData,
+			definedProperties[fileProperty] as string,
+		);
 
-        if (response.success) {
-            definedProperties[fileProperty] = response.data.id;
-        } else return response;
-    }
-    return {
-        success: true,
-        data: definedProperties,
-    };
+		if (response.success) {
+			definedProperties[fileProperty] = response.data.id;
+		} else return response;
+	}
+	return {
+		success: true,
+		data: definedProperties,
+	};
 }
 
 /**
@@ -170,46 +152,40 @@ export async function setFileProperties(
  * @group Utils
  */
 export async function processFileResponse<T extends Record<string, unknown>>(
-    nodeContext: IExecuteFunctions,
-    fileProperties: Set<string>,
-    data: T,
-    includeFileContent: boolean = false
+	nodeContext: IExecuteFunctions,
+	fileProperties: Set<string>,
+	data: T,
+	includeFileContent: boolean = false,
 ): Promise<FileAPIResponse<T>> {
-    let updatedData = { ...data };
-    const binaryData: Record<string, IBinaryData> = {};
-    for (const fileProperty of fileProperties) {
-        if (!data[fileProperty]) continue;
-        const fileMetadataResponse = await getFileMetadata(
-            nodeContext,
-            data[fileProperty] as string
-        );
-        if (!fileMetadataResponse.success)
-            return {
-                json: fileMetadataResponse,
-            };
+	let updatedData = { ...data };
+	const binaryData: Record<string, IBinaryData> = {};
+	for (const fileProperty of fileProperties) {
+		if (!data[fileProperty]) continue;
+		const fileMetadataResponse = await getFileMetadata(nodeContext, data[fileProperty] as string);
+		if (!fileMetadataResponse.success)
+			return {
+				json: fileMetadataResponse,
+			};
 
-        updatedData = {
-            ...updatedData,
-            [fileProperty]: fileMetadataResponse.data,
-        };
+		updatedData = {
+			...updatedData,
+			[fileProperty]: fileMetadataResponse.data,
+		};
 
-        if (includeFileContent) {
-            const fileContentResponse = await getFileContent(
-                nodeContext,
-                fileMetadataResponse.data.id
-            );
-            if (fileContentResponse.success) {
-                binaryData[fileProperty] = fileContentResponse.data;
-            } else {
-                return { json: fileContentResponse };
-            }
-        }
-    }
-    return {
-        json: {
-            success: true,
-            data: updatedData,
-        },
-        binary: binaryData,
-    };
+		if (includeFileContent) {
+			const fileContentResponse = await getFileContent(nodeContext, fileMetadataResponse.data.id);
+			if (fileContentResponse.success) {
+				binaryData[fileProperty] = fileContentResponse.data;
+			} else {
+				return { json: fileContentResponse };
+			}
+		}
+	}
+	return {
+		json: {
+			success: true,
+			data: updatedData,
+		},
+		binary: binaryData,
+	};
 }

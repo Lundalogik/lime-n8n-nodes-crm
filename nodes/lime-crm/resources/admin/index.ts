@@ -1,9 +1,9 @@
 import {
-    INodeExecutionData,
-    IExecuteFunctions,
-    INodeProperties,
-    NodePropertyTypes,
-    NodeOperationError,
+	INodeExecutionData,
+	IExecuteFunctions,
+	INodeProperties,
+	NodePropertyTypes,
+	NodeOperationError,
 } from 'n8n-workflow';
 
 import * as operations from './operations';
@@ -12,8 +12,8 @@ import { ADMIN_RESOURCE, User } from '../../models';
 import { N8NOperationModuleHandler } from '../../../modules';
 
 const moduleHandler = new N8NOperationModuleHandler([
-    operations.getManyUsers,
-    operations.getSingleUser,
+	operations.getManyUsers,
+	operations.getSingleUser,
 ]);
 
 /**
@@ -30,21 +30,21 @@ const moduleHandler = new N8NOperationModuleHandler([
  * @see {@link getSingleUser} - Operation to retrieve a single user from Lime CRM
  */
 export const adminFields: INodeProperties[] = [
-    {
-        displayName: 'Operation',
-        name: 'operation',
-        type: 'options' as NodePropertyTypes,
-        noDataExpression: true,
-        displayOptions: {
-            show: {
-                resource: [ADMIN_RESOURCE],
-            },
-        },
-        options: moduleHandler.getDescriptions(),
-        default: 'getSingleUser',
-    },
+	{
+		displayName: 'Operation',
+		name: 'operation',
+		type: 'options' as NodePropertyTypes,
+		noDataExpression: true,
+		displayOptions: {
+			show: {
+				resource: [ADMIN_RESOURCE],
+			},
+		},
+		options: moduleHandler.getDescriptions(),
+		default: 'getSingleUser',
+	},
 
-    ...moduleHandler.getProperties(),
+	...moduleHandler.getProperties(),
 ];
 
 /**
@@ -62,33 +62,30 @@ export const adminFields: INodeProperties[] = [
  * @group Resources
  */
 export async function adminOperations(
-    this: IExecuteFunctions,
-    { operation, i }: { operation: string; i: number }
+	this: IExecuteFunctions,
+	{ operation, i }: { operation: string; i: number },
 ): Promise<INodeExecutionData | INodeExecutionData[]> {
-    switch (operation) {
-        case 'getManyUsers': {
-            const result = await operations.getManyUsers.execute.call(this, i);
-            if (Array.isArray(result)) {
-                return result.map((item: User) => ({
-                    json: item,
-                }));
-            } else {
-                return {
-                    json: result,
-                };
-            }
-        }
-        case 'getSingleUser': {
-            return {
-                json: await operations.getSingleUser.execute.call(this, i),
-            };
-        }
-    }
+	switch (operation) {
+		case 'getManyUsers': {
+			const result = await operations.getManyUsers.execute.call(this, i);
+			if (Array.isArray(result)) {
+				return result.map((item: User) => ({
+					json: item,
+				}));
+			} else {
+				return {
+					json: result,
+				};
+			}
+		}
+		case 'getSingleUser': {
+			return {
+				json: await operations.getSingleUser.execute.call(this, i),
+			};
+		}
+	}
 
-    throw new NodeOperationError(
-        this.getNode(),
-        `The operation "${operation}" is not supported!`
-    );
+	throw new NodeOperationError(this.getNode(), `The operation "${operation}" is not supported!`);
 }
 
 export * from './operations';

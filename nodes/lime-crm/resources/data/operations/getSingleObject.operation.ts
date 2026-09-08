@@ -10,10 +10,10 @@ import { WorkflowFileResponse } from '../../../../response';
  * @public
  */
 export const description = {
-    name: 'Get an Object',
-    value: 'getSingleObject',
-    description: 'Get one specific object',
-    action: 'Get an object',
+	name: 'Get an Object',
+	value: 'getSingleObject',
+	description: 'Get one specific object',
+	action: 'Get an object',
 };
 
 /**
@@ -26,68 +26,68 @@ export const description = {
  * @public
  */
 export const properties: INodeProperties[] = [
-    {
-        displayName: 'Limetype',
-        name: 'limetype',
-        type: 'resourceLocator',
-        default: { mode: 'list', value: '' },
-        required: true,
-        description: 'The type of entity to retrieve',
-        modes: [
-            {
-                displayName: 'From List',
-                name: 'list',
-                type: 'list',
-                typeOptions: {
-                    searchListMethod: 'searchLimetypes',
-                    searchable: true,
-                },
-            },
-            {
-                displayName: 'By Name',
-                name: 'name',
-                type: 'string',
-                placeholder: 'e.g. company',
-            },
-        ],
-        displayOptions: {
-            show: {
-                resource: [DATA_RESOURCE],
-                operation: ['getSingleObject'],
-            },
-        },
-    },
+	{
+		displayName: 'Limetype',
+		name: 'limetype',
+		type: 'resourceLocator',
+		default: { mode: 'list', value: '' },
+		required: true,
+		description: 'The type of entity to retrieve',
+		modes: [
+			{
+				displayName: 'From List',
+				name: 'list',
+				type: 'list',
+				typeOptions: {
+					searchListMethod: 'searchLimetypes',
+					searchable: true,
+				},
+			},
+			{
+				displayName: 'By Name',
+				name: 'name',
+				type: 'string',
+				placeholder: 'e.g. company',
+			},
+		],
+		displayOptions: {
+			show: {
+				resource: [DATA_RESOURCE],
+				operation: ['getSingleObject'],
+			},
+		},
+	},
 
-    {
-        displayName: 'Object ID',
-        name: 'objectId',
-        type: 'string',
-        required: true,
-        default: '',
-        description: 'The ID of the object to retrieve',
-        displayOptions: {
-            show: {
-                resource: [DATA_RESOURCE],
-                operation: ['getSingleObject'],
-            },
-        },
-    },
-    {
-        displayName: 'Include file content',
-        name: 'includeFileContent',
-        type: 'boolean',
-        default: false,
-        description:
-            'Include file binary data if the Limetype has any file properties. ' +
-            'Keep performance in mind before activating this. ' +
-            'For Limetypes without any file properties, this setting is ignored.',
-        displayOptions: {
-            show: {
-                resource: [DATA_RESOURCE],
-                operation: ['getSingleObject'],
-            },
-        },
-    },
+	{
+		displayName: 'Object ID',
+		name: 'objectId',
+		type: 'string',
+		required: true,
+		default: '',
+		description: 'The ID of the object to retrieve',
+		displayOptions: {
+			show: {
+				resource: [DATA_RESOURCE],
+				operation: ['getSingleObject'],
+			},
+		},
+	},
+	{
+		displayName: 'Include file content',
+		name: 'includeFileContent',
+		type: 'boolean',
+		default: false,
+		description:
+			'Include file binary data if the Limetype has any file properties. ' +
+			'Keep performance in mind before activating this. ' +
+			'For Limetypes without any file properties, this setting is ignored.',
+		displayOptions: {
+			show: {
+				resource: [DATA_RESOURCE],
+				operation: ['getSingleObject'],
+			},
+		},
+	},
 ];
 
 /**
@@ -109,33 +109,30 @@ export const properties: INodeProperties[] = [
  * @public
  */
 export async function execute(
-    this: IExecuteFunctions,
-    i: number
+	this: IExecuteFunctions,
+	i: number,
 ): Promise<WorkflowFileResponse<Limeobject>> {
-    const limetype = this.getNodeParameter('limetype', i, undefined, {
-        extractValue: true,
-    }) as string;
-    const objectId = this.getNodeParameter('objectId', i) as string;
-    const includeFileContent = this.getNodeParameter(
-        'includeFileContent',
-        i
-    ) as boolean;
+	const limetype = this.getNodeParameter('limetype', i, undefined, {
+		extractValue: true,
+	}) as string;
+	const objectId = this.getNodeParameter('objectId', i) as string;
+	const includeFileContent = this.getNodeParameter('includeFileContent', i) as boolean;
 
-    const limeObjectResponse = await getLimeobject(this, limetype, objectId);
-    if (!limeObjectResponse.success) return { json: limeObjectResponse.data };
+	const limeObjectResponse = await getLimeobject(this, limetype, objectId);
+	if (!limeObjectResponse.success) return { json: limeObjectResponse.data };
 
-    const propertiesResponse = await getProperties(this, limetype);
-    if (!propertiesResponse.success) return { json: propertiesResponse.data };
+	const propertiesResponse = await getProperties(this, limetype);
+	if (!propertiesResponse.success) return { json: propertiesResponse.data };
 
-    const fileProperties = getFilePropertiesNames(propertiesResponse.data);
-    const fileResponse = await processFileResponse<Limeobject>(
-        this,
-        fileProperties,
-        limeObjectResponse.data,
-        includeFileContent
-    );
-    return {
-        json: fileResponse.json.data,
-        binary: fileResponse.binary,
-    };
+	const fileProperties = getFilePropertiesNames(propertiesResponse.data);
+	const fileResponse = await processFileResponse<Limeobject>(
+		this,
+		fileProperties,
+		limeObjectResponse.data,
+		includeFileContent,
+	);
+	return {
+		json: fileResponse.json.data,
+		binary: fileResponse.binary,
+	};
 }

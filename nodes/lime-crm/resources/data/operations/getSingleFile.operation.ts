@@ -1,8 +1,8 @@
 import {
-    IExecuteFunctions,
-    INodeExecutionData,
-    INodeProperties,
-    NodeOperationError,
+	IExecuteFunctions,
+	INodeExecutionData,
+	INodeProperties,
+	NodeOperationError,
 } from 'n8n-workflow';
 import { getFileContent, getFileContentByLimetype } from '../../../transport';
 import { DATA_RESOURCE } from '../../../models';
@@ -13,10 +13,10 @@ import { DATA_RESOURCE } from '../../../models';
  * @public
  */
 export const description = {
-    name: 'Get a File',
-    value: 'getSingleFile',
-    description: 'Get the file data for one specific file',
-    action: 'Get a file',
+	name: 'Get a File',
+	value: 'getSingleFile',
+	description: 'Get the file data for one specific file',
+	action: 'Get a file',
 };
 
 /**
@@ -30,98 +30,98 @@ export const description = {
  * @public
  */
 export const properties: INodeProperties[] = [
-    {
-        displayName: 'Get by',
-        name: 'source',
-        type: 'options',
-        required: true,
-        placeholder: 'Add Source',
-        displayOptions: {
-            show: {
-                resource: [DATA_RESOURCE],
-                operation: ['getSingleFile'],
-            },
-        },
-        options: [
-            {
-                name: 'File ID',
-                value: 'byFile',
-                description: 'Get file by its ID',
-            },
-            {
-                name: 'Limeobject ID',
-                value: 'byLimeobject',
-                description: "Get file by it's associated Limeobject ID",
-            },
-        ],
-        default: 'byFile',
-    },
-    {
-        displayName: 'Limetype',
-        name: 'limetype',
-        type: 'resourceLocator',
-        default: { mode: 'list', value: '' },
-        required: true,
-        description: 'The type of entity associated with the file',
-        modes: [
-            {
-                displayName: 'From List',
-                name: 'list',
-                type: 'list',
-                typeOptions: {
-                    searchListMethod: 'searchLimetypes',
-                    searchable: true,
-                },
-            },
-            {
-                displayName: 'By Name',
-                name: 'name',
-                type: 'string',
-                placeholder: 'e.g. company',
-            },
-        ],
-        displayOptions: {
-            show: {
-                resource: [DATA_RESOURCE],
-                operation: ['getSingleFile'],
-                source: ['byLimeobject'],
-            },
-        },
-    },
-    {
-        displayName: 'Identifier',
-        name: 'identifier',
-        type: 'string',
-        required: true,
-        default: '',
-        description: 'The ID of the file or Limeobject to retrieve',
-        displayOptions: {
-            show: {
-                resource: [DATA_RESOURCE],
-                operation: ['getSingleFile'],
-            },
-        },
-        placeholder: 'e.g., 12345',
-    },
-    {
-        displayName: 'File type property',
-        name: 'property',
-        type: 'options',
-        typeOptions: {
-            loadOptionsMethod: 'getFileProperties',
-            loadOptionsDependsOn: ['limetype.value'],
-        },
-        required: true,
-        default: '',
-        description: 'The type of entity associated with the file',
-        displayOptions: {
-            show: {
-                resource: [DATA_RESOURCE],
-                operation: ['getSingleFile'],
-                source: ['byLimeobject'],
-            },
-        },
-    },
+	{
+		displayName: 'Get by',
+		name: 'source',
+		type: 'options',
+		required: true,
+		placeholder: 'Add Source',
+		displayOptions: {
+			show: {
+				resource: [DATA_RESOURCE],
+				operation: ['getSingleFile'],
+			},
+		},
+		options: [
+			{
+				name: 'File ID',
+				value: 'byFile',
+				description: 'Get file by its ID',
+			},
+			{
+				name: 'Limeobject ID',
+				value: 'byLimeobject',
+				description: "Get file by it's associated Limeobject ID",
+			},
+		],
+		default: 'byFile',
+	},
+	{
+		displayName: 'Limetype',
+		name: 'limetype',
+		type: 'resourceLocator',
+		default: { mode: 'list', value: '' },
+		required: true,
+		description: 'The type of entity associated with the file',
+		modes: [
+			{
+				displayName: 'From List',
+				name: 'list',
+				type: 'list',
+				typeOptions: {
+					searchListMethod: 'searchLimetypes',
+					searchable: true,
+				},
+			},
+			{
+				displayName: 'By Name',
+				name: 'name',
+				type: 'string',
+				placeholder: 'e.g. company',
+			},
+		],
+		displayOptions: {
+			show: {
+				resource: [DATA_RESOURCE],
+				operation: ['getSingleFile'],
+				source: ['byLimeobject'],
+			},
+		},
+	},
+	{
+		displayName: 'Identifier',
+		name: 'identifier',
+		type: 'string',
+		required: true,
+		default: '',
+		description: 'The ID of the file or Limeobject to retrieve',
+		displayOptions: {
+			show: {
+				resource: [DATA_RESOURCE],
+				operation: ['getSingleFile'],
+			},
+		},
+		placeholder: 'e.g., 12345',
+	},
+	{
+		displayName: 'File type property',
+		name: 'property',
+		type: 'options',
+		typeOptions: {
+			loadOptionsMethod: 'getFileProperties',
+			loadOptionsDependsOn: ['limetype.value'],
+		},
+		required: true,
+		default: '',
+		description: 'The type of entity associated with the file',
+		displayOptions: {
+			show: {
+				resource: [DATA_RESOURCE],
+				operation: ['getSingleFile'],
+				source: ['byLimeobject'],
+			},
+		},
+	},
 ];
 
 /**
@@ -140,51 +140,40 @@ export const properties: INodeProperties[] = [
  *
  * @public
  */
-export async function execute(
-    this: IExecuteFunctions,
-    i: number
-): Promise<INodeExecutionData> {
-    const source = this.getNodeParameter('source', i) as string;
-    const id = this.getNodeParameter('identifier', i) as string;
+export async function execute(this: IExecuteFunctions, i: number): Promise<INodeExecutionData> {
+	const source = this.getNodeParameter('source', i) as string;
+	const id = this.getNodeParameter('identifier', i) as string;
 
-    if (source == 'byFile') {
-        const fileResponse = await getFileContent(this, id);
-        if (!fileResponse.success)
-            return {
-                json: fileResponse.data,
-            };
-        return {
-            json: {},
-            binary: { data: fileResponse.data },
-        };
-    }
-    if (source == 'byLimeobject') {
-        const limetype = this.getNodeParameter('limetype', i, undefined, {
-            extractValue: true,
-        }) as string;
-        const property = this.getNodeParameter('property', i) as string;
+	if (source == 'byFile') {
+		const fileResponse = await getFileContent(this, id);
+		if (!fileResponse.success)
+			return {
+				json: fileResponse.data,
+			};
+		return {
+			json: {},
+			binary: { data: fileResponse.data },
+		};
+	}
+	if (source == 'byLimeobject') {
+		const limetype = this.getNodeParameter('limetype', i, undefined, {
+			extractValue: true,
+		}) as string;
+		const property = this.getNodeParameter('property', i) as string;
 
-        const fileResponse = await getFileContentByLimetype(
-            this,
-            limetype,
-            id,
-            property
-        );
-        if (!fileResponse.success)
-            return {
-                json: fileResponse.data,
-            };
+		const fileResponse = await getFileContentByLimetype(this, limetype, id, property);
+		if (!fileResponse.success)
+			return {
+				json: fileResponse.data,
+			};
 
-        return {
-            json: {},
-            binary: {
-                data: fileResponse.data,
-            },
-        };
-    }
+		return {
+			json: {},
+			binary: {
+				data: fileResponse.data,
+			},
+		};
+	}
 
-    throw new NodeOperationError(
-        this.getNode(),
-        `The source "${source}" is not supported!`
-    );
+	throw new NodeOperationError(this.getNode(), `The source "${source}" is not supported!`);
 }

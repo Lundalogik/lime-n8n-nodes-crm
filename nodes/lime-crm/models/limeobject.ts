@@ -9,5 +9,5 @@ import { APIResponseValue } from './constants';
  * @group Models
  */
 export type Limeobject = {
-    id_: number;
+	id_: number;
 } & Record<string, APIResponseValue>;

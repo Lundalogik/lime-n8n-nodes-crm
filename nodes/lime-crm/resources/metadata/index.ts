@@ -1,9 +1,9 @@
 import {
-    INodeExecutionData,
-    IExecuteFunctions,
-    INodeProperties,
-    NodePropertyTypes,
-    NodeOperationError,
+	INodeExecutionData,
+	IExecuteFunctions,
+	INodeProperties,
+	NodePropertyTypes,
+	NodeOperationError,
 } from 'n8n-workflow';
 
 import * as operations from './operations';
@@ -11,9 +11,9 @@ import { METADATA_RESOURCE } from '../../models';
 import { N8NOperationModuleHandler } from '../../../modules';
 
 const moduleHandler = new N8NOperationModuleHandler([
-    operations.getAllLimetypes,
-    operations.getSingleLimetype,
-    operations.getSingleFileMetadata,
+	operations.getAllLimetypes,
+	operations.getSingleLimetype,
+	operations.getSingleFileMetadata,
 ]);
 
 /**
@@ -31,21 +31,21 @@ const moduleHandler = new N8NOperationModuleHandler([
  * @see {@link getSingleFileMetadata} - Operation to fetch metadata for a specific file
  */
 export const metadataFields: INodeProperties[] = [
-    {
-        displayName: 'Operation',
-        name: 'operation',
-        type: 'options' as NodePropertyTypes,
-        noDataExpression: true,
-        displayOptions: {
-            show: {
-                resource: [METADATA_RESOURCE],
-            },
-        },
-        options: moduleHandler.getDescriptions(),
-        default: 'getAllLimetypes',
-    },
+	{
+		displayName: 'Operation',
+		name: 'operation',
+		type: 'options' as NodePropertyTypes,
+		noDataExpression: true,
+		displayOptions: {
+			show: {
+				resource: [METADATA_RESOURCE],
+			},
+		},
+		options: moduleHandler.getDescriptions(),
+		default: 'getAllLimetypes',
+	},
 
-    ...moduleHandler.getProperties(),
+	...moduleHandler.getProperties(),
 ];
 
 /**
@@ -63,39 +63,33 @@ export const metadataFields: INodeProperties[] = [
  * @group Resources
  */
 export async function metadataOperations(
-    this: IExecuteFunctions,
-    { operation, i }: { operation: string; i: number }
+	this: IExecuteFunctions,
+	{ operation, i }: { operation: string; i: number },
 ): Promise<INodeExecutionData | INodeExecutionData[]> {
-    switch (operation) {
-        case 'getAllLimetypes': {
-            const results = await operations.getAllLimetypes.execute.call(this);
-            if (Array.isArray(results)) {
-                return results.map((limetype) => ({
-                    json: limetype,
-                }));
-            } else {
-                return { json: results };
-            }
-        }
-        case 'getSingleLimetype': {
-            return {
-                json: await operations.getSingleLimetype.execute.call(this, i),
-            };
-        }
-        case 'getSingleFileMetadata': {
-            return {
-                json: await operations.getSingleFileMetadata.execute.call(
-                    this,
-                    i
-                ),
-            };
-        }
-    }
+	switch (operation) {
+		case 'getAllLimetypes': {
+			const results = await operations.getAllLimetypes.execute.call(this);
+			if (Array.isArray(results)) {
+				return results.map((limetype) => ({
+					json: limetype,
+				}));
+			} else {
+				return { json: results };
+			}
+		}
+		case 'getSingleLimetype': {
+			return {
+				json: await operations.getSingleLimetype.execute.call(this, i),
+			};
+		}
+		case 'getSingleFileMetadata': {
+			return {
+				json: await operations.getSingleFileMetadata.execute.call(this, i),
+			};
+		}
+	}
 
-    throw new NodeOperationError(
-        this.getNode(),
-        `The operation "${operation}" is not supported!`
-    );
+	throw new NodeOperationError(this.getNode(), `The operation "${operation}" is not supported!`);
 }
 
 export * from './operations';

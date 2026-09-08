@@ -22,9 +22,9 @@ const LIMETYPE_URL = '/api/v1/limetype/';
  * @group Transport
  */
 export interface LimetypePropertyApiResponse {
-    name: string;
-    _links?: object;
-    _embedded?: object;
+	name: string;
+	_links?: object;
+	_embedded?: object;
 }
 
 /**
@@ -39,15 +39,15 @@ export interface LimetypePropertyApiResponse {
  * @group Transport
  */
 export interface LimetypeCrmApiResponse {
-    name: string;
-    localname?: {
-        singular?: string;
-        plural?: string;
-    };
-    _embedded: {
-        properties: LimetypePropertyApiResponse[];
-    };
-    _links: object;
+	name: string;
+	localname?: {
+		singular?: string;
+		plural?: string;
+	};
+	_embedded: {
+		properties: LimetypePropertyApiResponse[];
+	};
+	_links: object;
 }
 
 /**
@@ -61,10 +61,10 @@ export interface LimetypeCrmApiResponse {
  * @group Transport
  */
 export interface LimetypesCrmApiResponse {
-    _embedded: {
-        limetypes: LimetypeCrmApiResponse[];
-        _links: object;
-    };
+	_embedded: {
+		limetypes: LimetypeCrmApiResponse[];
+		_links: object;
+	};
 }
 
 /**
@@ -77,9 +77,9 @@ export interface LimetypesCrmApiResponse {
  * @group Transport
  */
 export interface LimetypePropertiesApiResponse {
-    _embedded: {
-        properties: LimetypeCrmApiResponse[];
-    };
+	_embedded: {
+		properties: LimetypeCrmApiResponse[];
+	};
 }
 
 /**
@@ -94,36 +94,30 @@ export interface LimetypePropertiesApiResponse {
  * @group Transport
  */
 function deserializeLimetype(limetype: LimetypeCrmApiResponse): Limetype {
-    return {
-        ...removeKeys(limetype, ['_links', '_embedded']),
-        properties: limetype._embedded.properties.map((property) =>
-            removeKeys(property, ['_links'])
-        ),
-    } as Limetype;
+	return {
+		...removeKeys(limetype, ['_links', '_embedded']),
+		properties: limetype._embedded.properties.map((property) => removeKeys(property, ['_links'])),
+	} as Limetype;
 }
 
 type RelatedTypeLinks = {
-    related_type?: {
-        name: string;
-    };
+	related_type?: {
+		name: string;
+	};
 };
 
-function getRelatedLimetypeName(property: {
-    _links?: unknown;
-}): string | undefined {
-    const links = property._links as RelatedTypeLinks | undefined;
-    return links?.related_type?.name;
+function getRelatedLimetypeName(property: { _links?: unknown }): string | undefined {
+	const links = property._links as RelatedTypeLinks | undefined;
+	return links?.related_type?.name;
 }
 
-function deserializeLimetypeProperty(
-    property: LimetypeCrmApiResponse
-): LimetypeProperty {
-    const relatedLimetype = getRelatedLimetypeName(property);
+function deserializeLimetypeProperty(property: LimetypeCrmApiResponse): LimetypeProperty {
+	const relatedLimetype = getRelatedLimetypeName(property);
 
-    return {
-        ...removeKeys(property, ['_links', '_embedded']),
-        ...(relatedLimetype ? { relatedLimetype } : {}),
-    } as LimetypeProperty;
+	return {
+		...removeKeys(property, ['_links', '_embedded']),
+		...(relatedLimetype ? { relatedLimetype } : {}),
+	} as LimetypeProperty;
 }
 
 /**
@@ -136,27 +130,25 @@ function deserializeLimetypeProperty(
  * @group Transport
  */
 export async function getLimetypesFromApi(
-    nodeContext: IAllExecuteFunctions
+	nodeContext: IAllExecuteFunctions,
 ): Promise<APIResponse<Limetype[]>> {
-    const response = await callLimeApi<LimetypesCrmApiResponse>(nodeContext, {
-        method: 'GET',
-        url: LIMETYPE_URL,
-        requestOptions: {
-            qs: {
-                _embed: 'limetypes.properties',
-            },
-        },
-    });
-    if (response.success) {
-        return {
-            success: true,
-            data:
-                response.data._embedded?.limetypes.map(deserializeLimetype) ||
-                [],
-        };
-    } else {
-        return response;
-    }
+	const response = await callLimeApi<LimetypesCrmApiResponse>(nodeContext, {
+		method: 'GET',
+		url: LIMETYPE_URL,
+		requestOptions: {
+			qs: {
+				_embed: 'limetypes.properties',
+			},
+		},
+	});
+	if (response.success) {
+		return {
+			success: true,
+			data: response.data._embedded?.limetypes.map(deserializeLimetype) || [],
+		};
+	} else {
+		return response;
+	}
 }
 
 /**
@@ -170,27 +162,27 @@ export async function getLimetypesFromApi(
  * @group Transport
  */
 export async function getLimetype(
-    nodeContext: IAllExecuteFunctions,
-    limetype: string
+	nodeContext: IAllExecuteFunctions,
+	limetype: string,
 ): Promise<APIResponse<Limetype>> {
-    const url = `${LIMETYPE_URL}${limetype}/`;
-    const response = await callLimeApi<LimetypeCrmApiResponse>(nodeContext, {
-        method: 'GET',
-        url: url,
-        requestOptions: {
-            qs: {
-                _embed: 'properties',
-            },
-        },
-    });
-    if (response.success) {
-        return {
-            success: true,
-            data: deserializeLimetype(response.data),
-        };
-    } else {
-        return response;
-    }
+	const url = `${LIMETYPE_URL}${limetype}/`;
+	const response = await callLimeApi<LimetypeCrmApiResponse>(nodeContext, {
+		method: 'GET',
+		url: url,
+		requestOptions: {
+			qs: {
+				_embed: 'properties',
+			},
+		},
+	});
+	if (response.success) {
+		return {
+			success: true,
+			data: deserializeLimetype(response.data),
+		};
+	} else {
+		return response;
+	}
 }
 
 /**
@@ -204,32 +196,29 @@ export async function getLimetype(
  * @group Transport
  */
 export async function getProperties(
-    nodeContext: IAllExecuteFunctions,
-    limetype: string
+	nodeContext: IAllExecuteFunctions,
+	limetype: string,
 ): Promise<APIResponse<LimetypeProperty[]>> {
-    const url = `${LIMETYPE_URL}${limetype}/`;
-    const response = await callLimeApi<LimetypePropertiesApiResponse>(
-        nodeContext,
-        {
-            method: 'GET',
-            url: url,
-            requestOptions: {
-                qs: {
-                    _embed: 'properties',
-                },
-            },
-            errorMetadata: {
-                limetype: limetype,
-            },
-        }
-    );
-    if (response.success) {
-        const properties = response.data._embedded?.properties ?? [];
-        return {
-            success: true,
-            data: properties.map(deserializeLimetypeProperty),
-        };
-    } else {
-        return response;
-    }
+	const url = `${LIMETYPE_URL}${limetype}/`;
+	const response = await callLimeApi<LimetypePropertiesApiResponse>(nodeContext, {
+		method: 'GET',
+		url: url,
+		requestOptions: {
+			qs: {
+				_embed: 'properties',
+			},
+		},
+		errorMetadata: {
+			limetype: limetype,
+		},
+	});
+	if (response.success) {
+		const properties = response.data._embedded?.properties ?? [];
+		return {
+			success: true,
+			data: properties.map(deserializeLimetypeProperty),
+		};
+	} else {
+		return response;
+	}
 }

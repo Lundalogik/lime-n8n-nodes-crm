@@ -9,19 +9,17 @@ import { getLimetypesFromApi } from '../transport';
  * @public
  * @group Load Options Methods
  */
-export async function getLimetypes(
-    this: ILoadOptionsFunctions
-): Promise<INodePropertyOptions[]> {
-    const data: INodePropertyOptions[] = [];
-    const response = await getLimetypesFromApi(this);
-    if (!response.success) return [];
+export async function getLimetypes(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+	const data: INodePropertyOptions[] = [];
+	const response = await getLimetypesFromApi(this);
+	if (!response.success) return [];
 
-    for (const limetype of response.data) {
-        data.push({
-            name: limetype.localname?.singular || limetype.name,
-            value: limetype.name,
-            description: limetype.name,
-        });
-    }
-    return data.sort((a, b) => a.name.localeCompare(b.name));
+	for (const limetype of response.data) {
+		data.push({
+			name: limetype.localname?.singular || limetype.name,
+			value: limetype.name,
+			description: limetype.name,
+		});
+	}
+	return data.sort((a, b) => a.name.localeCompare(b.name));
 }

@@ -1,8 +1,5 @@
 import { IDataObject, IExecuteFunctions, INodeProperties } from 'n8n-workflow';
-import {
-    getBulkImportProperties,
-    executeBulkImport,
-} from './bulkImportCommons';
+import { getBulkImportProperties, executeBulkImport } from './bulkImportCommons';
 
 /**
  * Description and metadata for the "Update many objects" operation in Lime CRM.
@@ -10,11 +7,10 @@ import {
  * @public
  */
 export const description = {
-    name: 'Update Many Objects (Bulk)',
-    value: 'bulkUpdateManyObjects',
-    description:
-        'Update multiple existing objects via bulk import. Skips business logic.',
-    action: 'Update many objects (bulk)',
+	name: 'Update Many Objects (Bulk)',
+	value: 'bulkUpdateManyObjects',
+	description: 'Update multiple existing objects via bulk import. Skips business logic.',
+	action: 'Update many objects (bulk)',
 };
 
 /**
@@ -23,8 +19,8 @@ export const description = {
  * @public
  */
 export const properties: INodeProperties[] = getBulkImportProperties(
-    'bulkUpdateManyObjects',
-    true // Matching property needed for update
+	'bulkUpdateManyObjects',
+	true, // Matching property needed for update
 );
 
 /**
@@ -37,8 +33,8 @@ export const properties: INodeProperties[] = getBulkImportProperties(
  * @public
  */
 export async function execute(
-    this: IExecuteFunctions,
-    i: number
+	this: IExecuteFunctions,
+	i: number,
 ): Promise<IDataObject | undefined> {
-    return executeBulkImport(this, i, 'update');
+	return executeBulkImport(this, i, 'update');
 }

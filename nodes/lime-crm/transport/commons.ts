@@ -23,25 +23,22 @@ export type HTTPMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
  * @public
  * @group Transport
  */
-export function removeKeys<T extends object, K extends keyof T>(
-    data: T,
-    keys: K[]
-): Omit<T, K> {
-    const { ...obj } = data;
-    for (const key of keys) {
-        delete obj[key];
-    }
-    return obj;
+export function removeKeys<T extends object, K extends keyof T>(data: T, keys: K[]): Omit<T, K> {
+	const { ...obj } = data;
+	for (const key of keys) {
+		delete obj[key];
+	}
+	return obj;
 }
 
 export function prepareResponseWithoutKeys<T extends object, K extends keyof T>(
-    response: SuccessResponse<T>,
-    keys: K[]
+	response: SuccessResponse<T>,
+	keys: K[],
 ): SuccessResponse<Omit<T, K>> {
-    return {
-        success: true,
-        data: removeKeys(response.data, keys),
-    };
+	return {
+		success: true,
+		data: removeKeys(response.data, keys),
+	};
 }
 
 /**
@@ -55,10 +52,8 @@ export function prepareResponseWithoutKeys<T extends object, K extends keyof T>(
  * @group Transport
  */
 async function getLimeUrl(context: IAllExecuteFunctions): Promise<string> {
-    const credentials = await context.getCredentials(
-        LIME_CRM_API_CREDENTIAL_KEY
-    );
-    return credentials.url as string;
+	const credentials = await context.getCredentials(LIME_CRM_API_CREDENTIAL_KEY);
+	return credentials.url as string;
 }
 
 /**
@@ -76,14 +71,14 @@ async function getLimeUrl(context: IAllExecuteFunctions): Promise<string> {
  */
 
 interface LimeAPIArguments {
-    method: HTTPMethod;
-    url: string;
-    requestOptions?: {
-        headers?: Record<string, string>;
-        [key: string]: unknown;
-    };
-    json?: boolean;
-    errorMetadata?: JsonObject;
+	method: HTTPMethod;
+	url: string;
+	requestOptions?: {
+		headers?: Record<string, string>;
+		[key: string]: unknown;
+	};
+	json?: boolean;
+	errorMetadata?: JsonObject;
 }
 
 /**
@@ -99,44 +94,40 @@ interface LimeAPIArguments {
  * @group Transport
  */
 export async function callLimeApi<T>(
-    nodeContext: IAllExecuteFunctions,
-    options: LimeAPIArguments
+	nodeContext: IAllExecuteFunctions,
+	options: LimeAPIArguments,
 ): Promise<APIResponse<T>> {
-    try {
-        const { headers: callerHeaders, ...restRequestOptions } =
-            options.requestOptions ?? {};
-        const response =
-            await nodeContext.helpers.httpRequestWithAuthentication.call(
-                nodeContext,
-                LIME_CRM_API_CREDENTIAL_KEY,
-                {
-                    method: options.method,
-                    url: options.url,
-                    json: options.json ?? true,
-                    baseURL: await getLimeUrl(nodeContext),
-                    ...restRequestOptions,
-                    headers: {
-                        ...buildLimeHeaders(nodeContext),
-                        ...callerHeaders,
-                    },
-                }
-            );
-        return {
-            success: true,
-            data: response,
-        };
-    } catch (error) {
-        const apiBody = error.context?.data;
-        const errorContext: WorkflowErrorContext = {
-            message: error.description
-                ? `${error.message}. ${error.description}`
-                : error.message,
-            status: error.httpCode ?? undefined,
-            metadata: {
-                ...options.errorMetadata,
-            },
-            ...(apiBody != null && { error: apiBody }),
-        };
-        return handleWorkflowError(nodeContext.getNode(), errorContext, true);
-    }
+	try {
+		const { headers: callerHeaders, ...restRequestOptions } = options.requestOptions ?? {};
+		const response = await nodeContext.helpers.httpRequestWithAuthentication.call(
+			nodeContext,
+			LIME_CRM_API_CREDENTIAL_KEY,
+			{
+				method: options.method,
+				url: options.url,
+				json: options.json ?? true,
+				baseURL: await getLimeUrl(nodeContext),
+				...restRequestOptions,
+				headers: {
+					...buildLimeHeaders(nodeContext),
+					...callerHeaders,
+				},
+			},
+		);
+		return {
+			success: true,
+			data: response,
+		};
+	} catch (error) {
+		const apiBody = error.context?.data;
+		const errorContext: WorkflowErrorContext = {
+			message: error.description ? `${error.message}. ${error.description}` : error.message,
+			status: error.httpCode ?? undefined,
+			metadata: {
+				...options.errorMetadata,
+			},
+			...(apiBody != null && { error: apiBody }),
+		};
+		return handleWorkflowError(nodeContext.getNode(), errorContext, true);
+	}
 }
