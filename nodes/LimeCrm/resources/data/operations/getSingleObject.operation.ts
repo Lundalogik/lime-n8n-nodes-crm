@@ -73,7 +73,7 @@ export const properties: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Include file content',
+		displayName: 'Include File Content',
 		name: 'includeFileContent',
 		type: 'boolean',
 		default: false,

@@ -149,7 +149,7 @@ export const properties: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Accept null for texts',
+		displayName: 'Accept Null for Texts',
 		name: 'acceptNullForTexts',
 		type: 'boolean',
 		default: false,

@@ -31,7 +31,7 @@ export const description = {
  */
 export const properties: INodeProperties[] = [
 	{
-		displayName: 'Get by',
+		displayName: 'Get By',
 		name: 'source',
 		type: 'options',
 		required: true,
@@ -104,7 +104,7 @@ export const properties: INodeProperties[] = [
 		placeholder: 'e.g., 12345',
 	},
 	{
-		displayName: 'File type property',
+		displayName: 'File Type Property Name or ID',
 		name: 'property',
 		type: 'options',
 		typeOptions: {
@@ -113,7 +113,8 @@ export const properties: INodeProperties[] = [
 		},
 		required: true,
 		default: '',
-		description: 'The type of entity associated with the file',
+		description:
+			'The type of entity associated with the file. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
 		displayOptions: {
 			show: {
 				resource: [DATA_RESOURCE],

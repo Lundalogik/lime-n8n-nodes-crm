@@ -11,7 +11,7 @@ import { fetchManyUsers } from '../../../transport';
 import { WorkflowResponse } from '../../../../response';
 
 export const description = {
-	name: 'Get many users',
+	name: 'Get Many Users',
 	value: 'getManyUsers',
 	description: 'Get a list of users in the system',
 	action: 'Get many users',
@@ -105,8 +105,11 @@ export const properties: INodeProperties[] = [
 		displayName: 'Limit',
 		name: 'limit',
 		type: 'number',
-		default: DEFAULT_API_OBJECT_LIMIT,
-		description: 'The maximum number of records to return',
+		typeOptions: {
+			minValue: 1,
+		},
+		default: 50,
+		description: 'Max number of results to return',
 		displayOptions: {
 			show: {
 				resource: [ADMIN_RESOURCE],
@@ -118,7 +121,7 @@ export const properties: INodeProperties[] = [
 		displayName: 'Include Coworker',
 		name: 'withCoworker',
 		type: 'boolean',
-		default: '',
+		default: false,
 		description: 'Whether to include coworker data in the response',
 		displayOptions: {
 			show: {

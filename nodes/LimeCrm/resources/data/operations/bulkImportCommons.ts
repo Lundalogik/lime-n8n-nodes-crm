@@ -86,9 +86,11 @@ export function getBulkImportProperties(
 			},
 		},
 		{
-			displayName: 'Matching Property',
+			displayName: 'Matching Property Name or ID',
 			name: 'matchingProperty',
 			type: 'options',
+			description:
+				'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
 			typeOptions: {
 				loadOptionsMethod: 'getNoHasManyProperties',
 				loadOptionsDependsOn: ['limetype.value'],
@@ -179,7 +181,7 @@ export function getBulkImportProperties(
 			type: 'resourceMapper',
 			placeholder: 'Add Relation Lookup',
 			description:
-				'For relation fields (belongsto/hasone), specify which property on the related object to use for matching.',
+				'For relation fields (belongsto/hasone), specify which property on the related object to use for matching',
 			typeOptions: {
 				resourceMapper: {
 					resourceMapperMethod: 'getRelationLookupMappingColumns',

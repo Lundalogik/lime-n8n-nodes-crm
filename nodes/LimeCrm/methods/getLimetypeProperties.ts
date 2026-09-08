@@ -177,7 +177,7 @@ export async function getRelationPropertiesWithLookupField(
 	}
 
 	const emptyOption: INodePropertyOptions = {
-		name: '(None - not a relation field)',
+		name: '(None - Not a Relation Field)',
 		value: '',
 		description: 'Leave empty if this field is not a relation',
 	};

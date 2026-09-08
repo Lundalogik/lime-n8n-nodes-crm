@@ -7,7 +7,7 @@ import { getBulkImportProperties, executeBulkImport } from './bulkImportCommons'
  * @public
  */
 export const description = {
-	name: 'Create Many Objects (bulk)',
+	name: 'Create Many Objects (Bulk)',
 	value: 'bulkCreateManyObjects',
 	description: 'Create multiple objects via bulk import. Skips business logic.',
 	action: 'Create many objects (bulk)',
