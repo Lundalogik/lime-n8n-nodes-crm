@@ -70,7 +70,7 @@ type OperationFn = (
  * @public
  * @group Node Definition
  */
-export class LimeCrmNode implements INodeType {
+export class LimeCrm implements INodeType {
 	/**
 	 * Node configuration and metadata, defining available resources, operations, and credentials.
 	 * Describes how the Lime CRM node appears and behaves in the n8n editor.

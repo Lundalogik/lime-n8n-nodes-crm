@@ -5,7 +5,7 @@
 
 import { IBinaryData, IDataObject, IExecuteFunctions, INodeExecutionData } from 'n8n-workflow';
 
-import * as transport from '../../../nodes/lime-crm/transport';
+import * as transport from '../../../nodes/LimeCrm/transport';
 
 // Faithful port of n8n-core's returnJsonArray (n8n-core is not a dev
 // dependency, so the real runtime helper is unavailable in tests): items
@@ -64,6 +64,6 @@ export function makeNodeExecuteContext(
 
 // ── Mock transport handles ───────────────────────────────────────────────────
 
-// The lime-crm transport barrel (nodes/lime-crm/transport). Use
+// The lime-crm transport barrel (nodes/LimeCrm/transport). Use
 // `transportMock.<fn>.mockResolvedValue(...)` from your spec.
 export const transportMock = transport as jest.Mocked<typeof transport>;

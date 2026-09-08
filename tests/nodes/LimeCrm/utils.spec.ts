@@ -1,4 +1,4 @@
-jest.mock('../../../nodes/lime-crm/transport', () => ({
+jest.mock('../../../nodes/LimeCrm/transport', () => ({
 	createFile: jest.fn().mockResolvedValue({
 		success: true,
 		data: { id: 1 },

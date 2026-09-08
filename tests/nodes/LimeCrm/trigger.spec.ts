@@ -1,5 +1,5 @@
 import { createHmac } from 'node:crypto';
-import { LimeCrmTrigger } from '../../../nodes/lime-crm/LimeCrmTrigger.node';
+import { LimeCrmTrigger } from '../../../nodes/LimeCrm/LimeCrmTrigger.node';
 
 describe('LimeCrmTrigger webhook secret handling', () => {
 	const node = {

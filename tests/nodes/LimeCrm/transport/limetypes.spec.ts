@@ -1,9 +1,9 @@
-import * as commons from '../../../../nodes/lime-crm/transport/commons';
+import * as commons from '../../../../nodes/LimeCrm/transport/commons';
 import {
 	getLimetype,
 	getLimetypesFromApi,
 	getProperties,
-} from '../../../../nodes/lime-crm/transport/limetypes';
+} from '../../../../nodes/LimeCrm/transport/limetypes';
 import { makeNodeExecuteContext } from '../helpers';
 
 const callLimeApiMock = jest.spyOn(commons, 'callLimeApi') as unknown as jest.Mock;

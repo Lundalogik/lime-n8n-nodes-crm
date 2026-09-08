@@ -5,6 +5,6 @@ export * from './resources/data';
 export * from './resources/metadata';
 export * from './resources/admin';
 export * from './transport';
-export * from './LimeCrmNode.node';
+export * from './LimeCrm.node';
 export * from './LimeCrmTrigger.node';
 export * from './serializers';

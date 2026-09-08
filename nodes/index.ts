@@ -1,4 +1,4 @@
 export * from './response';
-export * from './lime-crm';
+export * from './LimeCrm';
 export * from './modules';
 export * from './limeHeaders';
