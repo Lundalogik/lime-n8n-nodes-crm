@@ -72,20 +72,24 @@ export const properties: INodeProperties[] = [
 				value: '',
 			},
 			{
-				name: 'Standard',
-				value: 'STANDARD',
-			},
-			{
 				name: 'Administration',
 				value: 'ADMINISTRATION',
+			},
+			{
+				name: 'API',
+				value: 'API',
+			},
+			{
+				name: 'Integration',
+				value: 'INTEGRATION',
 			},
 			{
 				name: 'Service',
 				value: 'SERVICE',
 			},
 			{
-				name: 'Integration',
-				value: 'INTEGRATION',
+				name: 'Standard',
+				value: 'STANDARD',
 			},
 			{
 				name: 'Synchronization',
@@ -94,10 +98,6 @@ export const properties: INodeProperties[] = [
 			{
 				name: 'Test',
 				value: 'TEST',
-			},
-			{
-				name: 'API',
-				value: 'API',
 			},
 		],
 	},
