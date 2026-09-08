@@ -645,6 +645,7 @@ describe('LimeCrm execute — dispatch and error handling', () => {
 			{
 				json: {},
 				error: 'The operation "frobnicate" is not supported!',
+				pairedItem: { item: 0 },
 			},
 		]);
 	});
@@ -703,7 +704,7 @@ describe('LimeCrm execute — dispatch and error handling', () => {
 		const out = await node.execute.call(ctx);
 
 		expect(out[0]).toEqual([
-			{ json: {}, error: 'boom' },
+			{ json: {}, error: 'boom', pairedItem: { item: 0 } },
 			{ json: { _id: '2' }, binary: {} },
 		]);
 	});

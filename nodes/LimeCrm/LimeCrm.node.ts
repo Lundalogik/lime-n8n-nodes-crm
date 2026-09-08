@@ -208,7 +208,7 @@ export class LimeCrm implements INodeType {
 				}
 			} catch (error) {
 				if (this.continueOnFail()) {
-					returnData.push({ json: {}, error: error.message });
+					returnData.push({ json: {}, error: error.message, pairedItem: { item: i } });
 					continue;
 				}
 				throw toNodeError(this.getNode(), error);
