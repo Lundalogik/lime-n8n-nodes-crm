@@ -8,7 +8,7 @@ import {
 	SuccessResponse,
 } from '../../../nodes';
 import { ILoadOptionsFunctions } from 'n8n-workflow';
-import * as transport from '../../../nodes/lime-crm/transport';
+import * as transport from '../../../nodes/LimeCrm/transport';
 
 const mockILoadOptionFunctions = {
 	getNodeParameter: jest.fn().mockReturnValue('company'),

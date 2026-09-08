@@ -1,10 +1,10 @@
-// End-to-end tests for LimeCrmNode.execute(): resource/operation dispatch,
+// End-to-end tests for LimeCrm.execute(): resource/operation dispatch,
 // per-item looping, operation orchestration and output shaping.
 //
 // We mock only the transport layer so the real operations, resource
 // dispatchers and node execute run.
 
-jest.mock('../../../nodes/lime-crm/transport', () => ({
+jest.mock('../../../nodes/LimeCrm/transport', () => ({
 	getLimetype: jest.fn(),
 	getLimetypesFromApi: jest.fn(),
 	getProperties: jest.fn(),
@@ -33,8 +33,8 @@ jest.mock('../../../nodes/lime-crm/transport', () => ({
 }));
 
 import { IBinaryData, NodeOperationError } from 'n8n-workflow';
-import { LimeCrmNode } from '../../../nodes/lime-crm/LimeCrmNode.node';
-import { DEFAULT_API_OBJECT_LIMIT } from '../../../nodes/lime-crm/models';
+import { LimeCrm } from '../../../nodes/LimeCrm/LimeCrm.node';
+import { DEFAULT_API_OBJECT_LIMIT } from '../../../nodes/LimeCrm/models';
 import { makeNodeExecuteContext, transportMock } from './helpers';
 
 const ok = <T>(data: T) => ({ success: true, data });
@@ -43,13 +43,13 @@ const apiError = (message: string) => ({
 	data: { error: { message } },
 });
 
-const node = new LimeCrmNode();
+const node = new LimeCrm();
 
 beforeEach(() => {
 	jest.clearAllMocks();
 });
 
-describe('LimeCrmNode execute — metadata resource', () => {
+describe('LimeCrm execute — metadata resource', () => {
 	it('getAllLimetypes returns one item per limetype', async () => {
 		transportMock.getLimetypesFromApi.mockResolvedValue(
 			ok([{ name: 'person' }, { name: 'company' }]) as never,
@@ -138,7 +138,7 @@ describe('LimeCrmNode execute — metadata resource', () => {
 	});
 });
 
-describe('LimeCrmNode execute — data resource', () => {
+describe('LimeCrm execute — data resource', () => {
 	it('createSingleObject creates from JSON input', async () => {
 		transportMock.getProperties.mockResolvedValue(ok([]) as never);
 		transportMock.createLimeobject.mockResolvedValue(ok({ _id: 1, name: 'Jane' }) as never);
@@ -390,7 +390,7 @@ describe('LimeCrmNode execute — data resource', () => {
 	});
 });
 
-describe('LimeCrmNode execute — bulk import operations', () => {
+describe('LimeCrm execute — bulk import operations', () => {
 	const completedJob = {
 		status: 'completed',
 		startedAt: '2026-01-01T00:00:00Z',
@@ -545,7 +545,7 @@ describe('LimeCrmNode execute — bulk import operations', () => {
 	});
 });
 
-describe('LimeCrmNode execute — admin resource', () => {
+describe('LimeCrm execute — admin resource', () => {
 	it('getSingleUser fetches by user id', async () => {
 		transportMock.fetchSingleUserById.mockResolvedValue(
 			ok({ id: 'u1', username: 'jane' }) as never,
@@ -620,7 +620,7 @@ describe('LimeCrmNode execute — admin resource', () => {
 	});
 });
 
-describe('LimeCrmNode execute — dispatch and error handling', () => {
+describe('LimeCrm execute — dispatch and error handling', () => {
 	it('throws a NodeOperationError for an unknown operation', async () => {
 		const ctx = makeNodeExecuteContext({
 			resource: 'data',

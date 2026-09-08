@@ -1,13 +1,13 @@
 // We mock only callLimeApi — everything above it runs for real.
 
 import { NodeApiError } from 'n8n-workflow';
-import * as commons from '../../../../nodes/lime-crm/transport/commons';
+import * as commons from '../../../../nodes/LimeCrm/transport/commons';
 import {
 	createBulkImportJob,
 	getBulkImportJobStatus,
 	uploadBulkImportData,
 	waitForBulkImportJob,
-} from '../../../../nodes/lime-crm/transport/bulkimport';
+} from '../../../../nodes/LimeCrm/transport/bulkimport';
 import { makeNodeExecuteContext } from '../helpers';
 
 const callLimeApiMock = jest.spyOn(commons, 'callLimeApi') as unknown as jest.Mock;

@@ -1,12 +1,12 @@
 import { IBinaryData } from 'n8n-workflow';
-import * as commons from '../../../../nodes/lime-crm/transport/commons';
-import * as limeobjects from '../../../../nodes/lime-crm/transport/limeobjects';
+import * as commons from '../../../../nodes/LimeCrm/transport/commons';
+import * as limeobjects from '../../../../nodes/LimeCrm/transport/limeobjects';
 import {
 	createFile,
 	getFileContent,
 	getFileContentByLimetype,
 	getFileMetadataByLimeobject,
-} from '../../../../nodes/lime-crm/transport/files';
+} from '../../../../nodes/LimeCrm/transport/files';
 import { makeNodeExecuteContext } from '../helpers';
 
 const callLimeApiMock = jest.spyOn(commons, 'callLimeApi') as unknown as jest.Mock;

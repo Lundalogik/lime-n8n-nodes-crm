@@ -1,11 +1,11 @@
 import { IExecuteFunctions } from 'n8n-workflow';
 
-jest.mock('../../../nodes/lime-crm/transport', () => ({
+jest.mock('../../../nodes/LimeCrm/transport', () => ({
 	queryLimeobjects: jest.fn(),
 }));
 
-import { queryLimeobjects } from '../../../nodes/lime-crm/transport';
-import { execute } from '../../../nodes/lime-crm/resources/data/operations/getManyObjects.operation';
+import { queryLimeobjects } from '../../../nodes/LimeCrm/transport';
+import { execute } from '../../../nodes/LimeCrm/resources/data/operations/getManyObjects.operation';
 
 const mockedQuery = queryLimeobjects as jest.Mock;
 

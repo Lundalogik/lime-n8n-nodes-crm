@@ -1,23 +1,23 @@
-jest.mock('../../../../nodes/lime-crm/transport/limetypes', () => ({
+jest.mock('../../../../nodes/LimeCrm/transport/limetypes', () => ({
 	getLimetypesFromApi: jest.fn(),
 }));
-jest.mock('../../../../nodes/lime-crm/transport/limeQuery', () => ({
+jest.mock('../../../../nodes/LimeCrm/transport/limeQuery', () => ({
 	queryLimeobjects: jest.fn(),
 }));
-jest.mock('../../../../nodes/lime-crm/transport/limeobjects', () => ({
+jest.mock('../../../../nodes/LimeCrm/transport/limeobjects', () => ({
 	getLimeobject: jest.fn(),
 }));
 
 import { NodeApiError } from 'n8n-workflow';
-import * as commons from '../../../../nodes/lime-crm/transport/commons';
-import { getLimetypesFromApi } from '../../../../nodes/lime-crm/transport/limetypes';
-import { queryLimeobjects } from '../../../../nodes/lime-crm/transport/limeQuery';
-import { getLimeobject } from '../../../../nodes/lime-crm/transport/limeobjects';
+import * as commons from '../../../../nodes/LimeCrm/transport/commons';
+import { getLimetypesFromApi } from '../../../../nodes/LimeCrm/transport/limetypes';
+import { queryLimeobjects } from '../../../../nodes/LimeCrm/transport/limeQuery';
+import { getLimeobject } from '../../../../nodes/LimeCrm/transport/limeobjects';
 import {
 	fetchManyUsers,
 	fetchSingleUserById,
 	fetchSingleUserByLimeobjectId,
-} from '../../../../nodes/lime-crm/transport/users';
+} from '../../../../nodes/LimeCrm/transport/users';
 import { makeNodeExecuteContext } from '../helpers';
 
 const callLimeApiMock = jest.spyOn(commons, 'callLimeApi') as unknown as jest.Mock;
