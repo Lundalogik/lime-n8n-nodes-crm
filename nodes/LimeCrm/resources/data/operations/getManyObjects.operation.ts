@@ -166,7 +166,7 @@ export const properties: INodeProperties[] = [
 				name: 'property',
 				values: [
 					{
-						displayName: 'Property Name',
+						displayName: 'Property Name or ID',
 						name: 'name',
 						type: 'options',
 						typeOptions: {
@@ -175,7 +175,8 @@ export const properties: INodeProperties[] = [
 							loadOptionsDependsOn: ['limetype.value'],
 						},
 						default: '',
-						description: 'Name of the property',
+						description:
+							'Name of the property. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
 					},
 				],
 			},
@@ -213,7 +214,11 @@ export const properties: INodeProperties[] = [
 		displayName: 'Limit',
 		name: 'limit',
 		type: 'number',
-		default: DEFAULT_API_OBJECT_LIMIT,
+		typeOptions: {
+			minValue: 1,
+		},
+		description: 'Max number of results to return',
+		default: 50,
 		description:
 			'The maximum number of objects to return. Leaving an empty input or specifying "0" will return ' +
 			'all objects.',
@@ -288,7 +293,7 @@ export const properties: INodeProperties[] = [
 				displayName: 'Order By Fields',
 				values: [
 					{
-						displayName: 'Property Name',
+						displayName: 'Property Name or ID',
 						name: 'propertyName',
 						type: 'options',
 						required: true,
@@ -298,7 +303,8 @@ export const properties: INodeProperties[] = [
 							loadOptionsDependsOn: ['limetype.value'],
 						},
 						default: '',
-						description: 'Name of the property to order by',
+						description:
+							'Name of the property to order by. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
 					},
 					{
 						displayName: 'Sort Direction',

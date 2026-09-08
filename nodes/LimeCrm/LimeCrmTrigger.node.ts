@@ -98,14 +98,15 @@ export class LimeCrmTrigger implements INodeType {
 						displayName: 'Event',
 						values: [
 							{
-								displayName: 'Limetype',
+								displayName: 'Limetype Name or ID',
 								name: 'limetype',
 								type: 'options',
 								typeOptions: {
 									loadOptionsMethod: 'getLimetypes',
 								},
 								default: '',
-								description: 'Limetype to subscribe to events for',
+								description:
+									'Limetype to subscribe to events for. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
 							},
 							{
 								displayName: 'Event',

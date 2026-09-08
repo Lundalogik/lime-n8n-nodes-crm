@@ -5,7 +5,7 @@ import { WorkflowResponse, APIResponse } from '../../../../response';
 import { handleWorkflowError } from '../../../../errorHandling';
 
 export const description = {
-	name: 'Get single user',
+	name: 'Get Single User',
 	value: 'getSingleUser',
 	description: 'Get a single user data',
 	action: 'Get single user',
@@ -20,7 +20,7 @@ export const description = {
  */
 export const properties: INodeProperties[] = [
 	{
-		displayName: 'Get by',
+		displayName: 'Get By',
 		name: 'source',
 		type: 'options',
 		required: true,
@@ -63,7 +63,7 @@ export const properties: INodeProperties[] = [
 		displayName: 'Include Coworker',
 		name: 'withCoworker',
 		type: 'boolean',
-		default: '',
+		default: false,
 		description: 'Whether to include coworker data in the response',
 		displayOptions: {
 			show: {
