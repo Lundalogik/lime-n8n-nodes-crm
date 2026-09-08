@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { IExecuteFunctions, LoggerProxy as Logger, NodeApiError } from 'n8n-workflow';
+import { IExecuteFunctions, LoggerProxy as Logger, NodeApiError, sleep } from 'n8n-workflow';
 import { callLimeApi } from './commons';
 
 /**
@@ -276,7 +276,7 @@ export async function waitForBulkImportJob(
 
 	while (['waiting_for_data', 'ready', 'running'].includes(status)) {
 		// Wait before polling
-		await new Promise((resolve) => setTimeout(resolve, pollIntervalMs));
+		await sleep(pollIntervalMs);
 
 		Logger.info(`Polling bulk import job ID: ${jobId}`);
 		response = await getBulkImportJobStatus(context, jobId);
