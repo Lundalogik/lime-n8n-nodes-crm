@@ -1,5 +1,5 @@
 {
-	"node": "@limetech/n8n-nodes-lime-crm.limeCrm",
+	"node": "@limetech/n8n-nodes-lime-crm.limeCrmTrigger",
 	"nodeVersion": "1.0",
 	"codexVersion": "1.0",
 	"categories": ["Sales"],
