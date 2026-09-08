@@ -10,10 +10,10 @@ import { WorkflowResponse } from '../../../../response';
  * @public
  */
 export const description = {
-    name: 'Get Many Objects',
-    value: 'getManyObjects',
-    description: 'Get a list of many objects',
-    action: 'Get many objects',
+	name: 'Get Many Objects',
+	value: 'getManyObjects',
+	description: 'Get a list of many objects',
+	action: 'Get many objects',
 };
 
 /**
@@ -42,9 +42,9 @@ const BATCHSIZE = 200;
  * @internal
  */
 interface ResponseFormat {
-    object: {
-        [key: string]: string;
-    };
+	object: {
+		[key: string]: string;
+	};
 }
 
 /**
@@ -65,10 +65,10 @@ interface ResponseFormat {
  * @internal
  */
 interface OrderByCollection {
-    orderByFields: {
-        propertyName: string;
-        sortDirection: 'ASC' | 'DESC';
-    }[];
+	orderByFields: {
+		propertyName: string;
+		sortDirection: 'ASC' | 'DESC';
+	}[];
 }
 
 /**
@@ -87,251 +87,249 @@ interface OrderByCollection {
  * @public
  */
 export const properties: INodeProperties[] = [
-    {
-        displayName: 'Limetype',
-        name: 'limetype',
-        type: 'resourceLocator',
-        default: { mode: 'list', value: '' },
-        required: true,
-        description: 'The type of entity to query',
-        modes: [
-            {
-                displayName: 'From List',
-                name: 'list',
-                type: 'list',
-                typeOptions: {
-                    searchListMethod: 'searchLimetypes',
-                    searchable: true,
-                },
-            },
-            {
-                displayName: 'By Name',
-                name: 'name',
-                type: 'string',
-                placeholder: 'e.g. company',
-            },
-        ],
-        displayOptions: {
-            show: {
-                resource: [DATA_RESOURCE],
-                operation: ['getManyObjects'],
-            },
-        },
-    },
-    {
-        displayName: 'Response Format',
-        name: 'responseFormatInputMethod',
-        type: 'options',
-        required: true,
-        default: 'fields',
-        description: 'Select how the response should be formatted',
-        displayOptions: {
-            show: {
-                resource: [DATA_RESOURCE],
-                operation: ['getManyObjects'],
-            },
-        },
-        options: [
-            {
-                name: 'Form',
-                value: 'fields',
-                description: 'Define fields using the UI',
-            },
-            {
-                name: 'JSON Object',
-                value: 'json',
-                description: 'Define fields using JSON',
-            },
-        ],
-    },
-    {
-        displayName: 'Response Format (Form)',
-        name: 'responseFormatProperties',
-        type: 'fixedCollection',
-        placeholder: 'Add Property',
-        typeOptions: {
-            multipleValues: true,
-        },
-        default: {},
-        displayOptions: {
-            show: {
-                resource: [DATA_RESOURCE],
-                operation: ['getManyObjects'],
-                responseFormatInputMethod: ['fields'],
-            },
-        },
-        options: [
-            {
-                displayName: 'Property',
-                name: 'property',
-                values: [
-                    {
-                        displayName: 'Property Name',
-                        name: 'name',
-                        type: 'options',
-                        typeOptions: {
-                            sortable: true,
-                            loadOptionsMethod: 'getNoHasManyProperties',
-                            loadOptionsDependsOn: ['limetype.value'],
-                        },
-                        default: '',
-                        description: 'Name of the property',
-                    },
-                ],
-            },
-        ],
-    },
-    {
-        displayName: 'Response Format (JSON)',
-        name: 'responseFormatJson',
-        type: 'json',
-        required: true,
-        default: '{\n\t"object": {\n\t\t"_id": ""\n\t}\n}',
-        description:
-            'Information included in the response when using JSON format',
-        displayOptions: {
-            show: {
-                resource: [DATA_RESOURCE],
-                operation: ['getManyObjects'],
-                responseFormatInputMethod: ['json'],
-            },
-        },
-    },
-    {
-        displayName: 'Filter (JSON)',
-        name: 'filter',
-        type: 'json',
-        default: '{}',
-        description: "The filter DSL defining the query's conditions",
-        displayOptions: {
-            show: {
-                resource: [DATA_RESOURCE],
-                operation: ['getManyObjects'],
-            },
-        },
-    },
-    {
-        displayName: 'Limit',
-        name: 'limit',
-        type: 'number',
-        default: DEFAULT_API_OBJECT_LIMIT,
-        description:
-            'The maximum number of objects to return. Leaving an empty input or specifying "0" will return ' +
-            'all objects.',
-        displayOptions: {
-            show: {
-                resource: [DATA_RESOURCE],
-                operation: ['getManyObjects'],
-            },
-        },
-    },
-    {
-        displayName: 'Offset',
-        name: 'offset',
-        type: 'number',
-        default: '',
-        placeholder: 'e.g. 200',
-        description:
-            'Use together with Limit to manually control pagination when fetching data in batches. This is useful when the number of records exceeds tens of thousands and you want to keep each workflow iteration lightweight. Leave empty to fetch all objects at once, using automatic pagination under the hood.',
-        displayOptions: {
-            show: {
-                resource: [DATA_RESOURCE],
-                operation: ['getManyObjects'],
-            },
-        },
-    },
-    {
-        displayName: 'Order By',
-        name: 'orderByInputMethod',
-        type: 'options',
-        required: true,
-        default: 'fields',
-        description: 'Select how the response should be ordered',
-        displayOptions: {
-            show: {
-                resource: [DATA_RESOURCE],
-                operation: ['getManyObjects'],
-            },
-        },
-        options: [
-            {
-                name: 'Form',
-                value: 'fields',
-                description: 'Define fields using the UI',
-            },
-            {
-                name: 'JSON Object',
-                value: 'json',
-                description: 'Define fields using JSON',
-            },
-        ],
-    },
-    {
-        displayName: 'Order By (Form)',
-        name: 'orderByProperties',
-        type: 'fixedCollection',
-        placeholder: 'Add Property',
-        typeOptions: {
-            multipleValues: true,
-        },
-        default: {},
-        description:
-            'The list of properties by which to order the query results',
-        displayOptions: {
-            show: {
-                resource: [DATA_RESOURCE],
-                operation: ['getManyObjects'],
-                orderByInputMethod: ['fields'],
-            },
-        },
-        options: [
-            {
-                name: 'orderByFields',
-                displayName: 'Order By Fields',
-                values: [
-                    {
-                        displayName: 'Property Name',
-                        name: 'propertyName',
-                        type: 'options',
-                        required: true,
-                        typeOptions: {
-                            sortable: true,
-                            loadOptionsMethod: 'getNoHasManyProperties',
-                            loadOptionsDependsOn: ['limetype.value'],
-                        },
-                        default: '',
-                        description: 'Name of the property to order by',
-                    },
-                    {
-                        displayName: 'Sort Direction',
-                        name: 'sortDirection',
-                        type: 'options',
-                        default: 'ASC',
-                        description: 'Ordering direction',
-                        options: [
-                            { name: 'Ascending', value: 'ASC' },
-                            { name: 'Descending', value: 'DESC' },
-                        ],
-                    },
-                ],
-            },
-        ],
-    },
-    {
-        displayName: 'Order By (JSON)',
-        name: 'orderByJson',
-        type: 'json',
-        required: true,
-        default: '[\n\t{\n\t\t"_id": "ASC"\n\t}\n]',
-        description: 'Provide ordering in JSON',
-        displayOptions: {
-            show: {
-                resource: [DATA_RESOURCE],
-                operation: ['getManyObjects'],
-                orderByInputMethod: ['json'],
-            },
-        },
-    },
+	{
+		displayName: 'Limetype',
+		name: 'limetype',
+		type: 'resourceLocator',
+		default: { mode: 'list', value: '' },
+		required: true,
+		description: 'The type of entity to query',
+		modes: [
+			{
+				displayName: 'From List',
+				name: 'list',
+				type: 'list',
+				typeOptions: {
+					searchListMethod: 'searchLimetypes',
+					searchable: true,
+				},
+			},
+			{
+				displayName: 'By Name',
+				name: 'name',
+				type: 'string',
+				placeholder: 'e.g. company',
+			},
+		],
+		displayOptions: {
+			show: {
+				resource: [DATA_RESOURCE],
+				operation: ['getManyObjects'],
+			},
+		},
+	},
+	{
+		displayName: 'Response Format',
+		name: 'responseFormatInputMethod',
+		type: 'options',
+		required: true,
+		default: 'fields',
+		description: 'Select how the response should be formatted',
+		displayOptions: {
+			show: {
+				resource: [DATA_RESOURCE],
+				operation: ['getManyObjects'],
+			},
+		},
+		options: [
+			{
+				name: 'Form',
+				value: 'fields',
+				description: 'Define fields using the UI',
+			},
+			{
+				name: 'JSON Object',
+				value: 'json',
+				description: 'Define fields using JSON',
+			},
+		],
+	},
+	{
+		displayName: 'Response Format (Form)',
+		name: 'responseFormatProperties',
+		type: 'fixedCollection',
+		placeholder: 'Add Property',
+		typeOptions: {
+			multipleValues: true,
+		},
+		default: {},
+		displayOptions: {
+			show: {
+				resource: [DATA_RESOURCE],
+				operation: ['getManyObjects'],
+				responseFormatInputMethod: ['fields'],
+			},
+		},
+		options: [
+			{
+				displayName: 'Property',
+				name: 'property',
+				values: [
+					{
+						displayName: 'Property Name',
+						name: 'name',
+						type: 'options',
+						typeOptions: {
+							sortable: true,
+							loadOptionsMethod: 'getNoHasManyProperties',
+							loadOptionsDependsOn: ['limetype.value'],
+						},
+						default: '',
+						description: 'Name of the property',
+					},
+				],
+			},
+		],
+	},
+	{
+		displayName: 'Response Format (JSON)',
+		name: 'responseFormatJson',
+		type: 'json',
+		required: true,
+		default: '{\n\t"object": {\n\t\t"_id": ""\n\t}\n}',
+		description: 'Information included in the response when using JSON format',
+		displayOptions: {
+			show: {
+				resource: [DATA_RESOURCE],
+				operation: ['getManyObjects'],
+				responseFormatInputMethod: ['json'],
+			},
+		},
+	},
+	{
+		displayName: 'Filter (JSON)',
+		name: 'filter',
+		type: 'json',
+		default: '{}',
+		description: "The filter DSL defining the query's conditions",
+		displayOptions: {
+			show: {
+				resource: [DATA_RESOURCE],
+				operation: ['getManyObjects'],
+			},
+		},
+	},
+	{
+		displayName: 'Limit',
+		name: 'limit',
+		type: 'number',
+		default: DEFAULT_API_OBJECT_LIMIT,
+		description:
+			'The maximum number of objects to return. Leaving an empty input or specifying "0" will return ' +
+			'all objects.',
+		displayOptions: {
+			show: {
+				resource: [DATA_RESOURCE],
+				operation: ['getManyObjects'],
+			},
+		},
+	},
+	{
+		displayName: 'Offset',
+		name: 'offset',
+		type: 'number',
+		default: '',
+		placeholder: 'e.g. 200',
+		description:
+			'Use together with Limit to manually control pagination when fetching data in batches. This is useful when the number of records exceeds tens of thousands and you want to keep each workflow iteration lightweight. Leave empty to fetch all objects at once, using automatic pagination under the hood.',
+		displayOptions: {
+			show: {
+				resource: [DATA_RESOURCE],
+				operation: ['getManyObjects'],
+			},
+		},
+	},
+	{
+		displayName: 'Order By',
+		name: 'orderByInputMethod',
+		type: 'options',
+		required: true,
+		default: 'fields',
+		description: 'Select how the response should be ordered',
+		displayOptions: {
+			show: {
+				resource: [DATA_RESOURCE],
+				operation: ['getManyObjects'],
+			},
+		},
+		options: [
+			{
+				name: 'Form',
+				value: 'fields',
+				description: 'Define fields using the UI',
+			},
+			{
+				name: 'JSON Object',
+				value: 'json',
+				description: 'Define fields using JSON',
+			},
+		],
+	},
+	{
+		displayName: 'Order By (Form)',
+		name: 'orderByProperties',
+		type: 'fixedCollection',
+		placeholder: 'Add Property',
+		typeOptions: {
+			multipleValues: true,
+		},
+		default: {},
+		description: 'The list of properties by which to order the query results',
+		displayOptions: {
+			show: {
+				resource: [DATA_RESOURCE],
+				operation: ['getManyObjects'],
+				orderByInputMethod: ['fields'],
+			},
+		},
+		options: [
+			{
+				name: 'orderByFields',
+				displayName: 'Order By Fields',
+				values: [
+					{
+						displayName: 'Property Name',
+						name: 'propertyName',
+						type: 'options',
+						required: true,
+						typeOptions: {
+							sortable: true,
+							loadOptionsMethod: 'getNoHasManyProperties',
+							loadOptionsDependsOn: ['limetype.value'],
+						},
+						default: '',
+						description: 'Name of the property to order by',
+					},
+					{
+						displayName: 'Sort Direction',
+						name: 'sortDirection',
+						type: 'options',
+						default: 'ASC',
+						description: 'Ordering direction',
+						options: [
+							{ name: 'Ascending', value: 'ASC' },
+							{ name: 'Descending', value: 'DESC' },
+						],
+					},
+				],
+			},
+		],
+	},
+	{
+		displayName: 'Order By (JSON)',
+		name: 'orderByJson',
+		type: 'json',
+		required: true,
+		default: '[\n\t{\n\t\t"_id": "ASC"\n\t}\n]',
+		description: 'Provide ordering in JSON',
+		displayOptions: {
+			show: {
+				resource: [DATA_RESOURCE],
+				operation: ['getManyObjects'],
+				orderByInputMethod: ['json'],
+			},
+		},
+	},
 ];
 
 /**
@@ -357,14 +355,12 @@ export const properties: INodeProperties[] = [
  *
  * @internal
  */
-function createResponseFormatObject(
-    properties: { name: string }[] = []
-): ResponseFormat {
-    const object: Record<string, string> = { _id: '' };
-    for (const { name } of properties) {
-        if (name) object[name] = '';
-    }
-    return { object };
+function createResponseFormatObject(properties: { name: string }[] = []): ResponseFormat {
+	const object: Record<string, string> = { _id: '' };
+	for (const { name } of properties) {
+		if (name) object[name] = '';
+	}
+	return { object };
 }
 
 /**
@@ -395,12 +391,12 @@ function createResponseFormatObject(
  * @internal
  */
 function getOrderBy(orderByCollection: OrderByCollection) {
-    const orderBy =
-        orderByCollection.orderByFields &&
-        orderByCollection.orderByFields.map((field) => ({
-            [field.propertyName]: field.sortDirection,
-        }));
-    return orderBy || [{ _id: 'ASC' }];
+	const orderBy =
+		orderByCollection.orderByFields &&
+		orderByCollection.orderByFields.map((field) => ({
+			[field.propertyName]: field.sortDirection,
+		}));
+	return orderBy || [{ _id: 'ASC' }];
 }
 
 /**
@@ -420,54 +416,52 @@ function getOrderBy(orderByCollection: OrderByCollection) {
  * @returns Array of fetched objects or an error response as an array.
  */
 async function fetchLimeObjects(
-    this: IExecuteFunctions,
-    limetype: string,
-    responseFormat: ResponseFormat,
-    filter: string,
-    limit: number | null,
-    orderBy: Record<string, 'ASC' | 'DESC'>[],
-    offset = 0
+	this: IExecuteFunctions,
+	limetype: string,
+	responseFormat: ResponseFormat,
+	filter: string,
+	limit: number | null,
+	orderBy: Record<string, 'ASC' | 'DESC'>[],
+	offset = 0,
 ): Promise<WorkflowResponse<IncludedProperties[]>> {
-    const allResults: IncludedProperties[] = [];
-    const parsedFilter = JSON.parse(filter);
-    const unlimited = limit === null || limit === 0;
-    const targetLimit = unlimited ? Infinity : limit;
+	const allResults: IncludedProperties[] = [];
+	const parsedFilter = JSON.parse(filter);
+	const unlimited = limit === null || limit === 0;
+	const targetLimit = unlimited ? Infinity : limit;
 
-    let fetched = 0;
-    let currentOffset = offset;
+	let fetched = 0;
+	let currentOffset = offset;
 
-    while (fetched < targetLimit) {
-        const currentLimit =
-            targetLimit === Infinity
-                ? BATCHSIZE
-                : Math.min(BATCHSIZE, targetLimit - fetched);
+	while (fetched < targetLimit) {
+		const currentLimit =
+			targetLimit === Infinity ? BATCHSIZE : Math.min(BATCHSIZE, targetLimit - fetched);
 
-        const q = JSON.stringify({
-            limetype,
-            responseFormat: responseFormat,
-            filter: parsedFilter,
-            limit: currentLimit,
-            offset: currentOffset,
-            orderBy: orderBy,
-        });
+		const q = JSON.stringify({
+			limetype,
+			responseFormat: responseFormat,
+			filter: parsedFilter,
+			limit: currentLimit,
+			offset: currentOffset,
+			orderBy: orderBy,
+		});
 
-        const batchResponse = await queryLimeobjects(this, q);
-        if (!batchResponse.success) return batchResponse.data;
+		const batchResponse = await queryLimeobjects(this, q);
+		if (!batchResponse.success) return batchResponse.data;
 
-        const batch = batchResponse.data;
+		const batch = batchResponse.data;
 
-        const collected = batch.objects.length;
-        if (collected === 0) break;
+		const collected = batch.objects.length;
+		if (collected === 0) break;
 
-        allResults.push(...batch.objects);
+		allResults.push(...batch.objects);
 
-        fetched += collected;
-        currentOffset += collected;
+		fetched += collected;
+		currentOffset += collected;
 
-        if (collected < currentLimit) break;
-    }
+		if (collected < currentLimit) break;
+	}
 
-    return allResults;
+	return allResults;
 }
 
 /**
@@ -489,56 +483,34 @@ async function fetchLimeObjects(
  * @public
  */
 export async function execute(this: IExecuteFunctions, i: number) {
-    const limetype = this.getNodeParameter('limetype', i, undefined, {
-        extractValue: true,
-    }) as string;
-    const responseFormatInputMethod = this.getNodeParameter(
-        'responseFormatInputMethod',
-        i
-    ) as string;
-    const orderByInputMethod = this.getNodeParameter(
-        'orderByInputMethod',
-        i
-    ) as string;
-    const filter = this.getNodeParameter('filter', i) as string;
-    const limit = this.getNodeParameter(
-        'limit',
-        i,
-        DEFAULT_API_OBJECT_LIMIT
-    ) as number;
-    const offset = (this.getNodeParameter('offset', i, 0) as number) || 0;
+	const limetype = this.getNodeParameter('limetype', i, undefined, {
+		extractValue: true,
+	}) as string;
+	const responseFormatInputMethod = this.getNodeParameter('responseFormatInputMethod', i) as string;
+	const orderByInputMethod = this.getNodeParameter('orderByInputMethod', i) as string;
+	const filter = this.getNodeParameter('filter', i) as string;
+	const limit = this.getNodeParameter('limit', i, DEFAULT_API_OBJECT_LIMIT) as number;
+	const offset = (this.getNodeParameter('offset', i, 0) as number) || 0;
 
-    let response;
-    if (responseFormatInputMethod === 'fields') {
-        const properties = this.getNodeParameter(
-            'responseFormatProperties',
-            i
-        ) as { property: [{ name: string }] };
-        response = createResponseFormatObject(properties.property);
-    } else if (responseFormatInputMethod === 'json') {
-        response = this.getNodeParameter('responseFormatJson', i) as string;
-        response = JSON.parse(response);
-    }
+	let response;
+	if (responseFormatInputMethod === 'fields') {
+		const properties = this.getNodeParameter('responseFormatProperties', i) as {
+			property: [{ name: string }];
+		};
+		response = createResponseFormatObject(properties.property);
+	} else if (responseFormatInputMethod === 'json') {
+		response = this.getNodeParameter('responseFormatJson', i) as string;
+		response = JSON.parse(response);
+	}
 
-    let orderBy;
-    if (orderByInputMethod === 'fields') {
-        const orderByCollection = this.getNodeParameter(
-            'orderByProperties',
-            i
-        ) as OrderByCollection;
-        orderBy = getOrderBy(orderByCollection);
-    } else if (orderByInputMethod === 'json') {
-        orderBy = this.getNodeParameter('orderByJson', i) as string;
-        orderBy = JSON.parse(orderBy);
-    }
+	let orderBy;
+	if (orderByInputMethod === 'fields') {
+		const orderByCollection = this.getNodeParameter('orderByProperties', i) as OrderByCollection;
+		orderBy = getOrderBy(orderByCollection);
+	} else if (orderByInputMethod === 'json') {
+		orderBy = this.getNodeParameter('orderByJson', i) as string;
+		orderBy = JSON.parse(orderBy);
+	}
 
-    return await fetchLimeObjects.call(
-        this,
-        limetype,
-        response,
-        filter,
-        limit,
-        orderBy,
-        offset
-    );
+	return await fetchLimeObjects.call(this, limetype, response, filter, limit, orderBy, offset);
 }

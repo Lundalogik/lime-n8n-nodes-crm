@@ -23,10 +23,10 @@ export type WebhookFunctions = IHookFunctions | IWebhookFunctions;
  * @group Models
  */
 export interface WebhookContext {
-    nodeId: string;
-    nodeName?: string;
-    workflowId?: string;
-    workflowName?: string;
+	nodeId: string;
+	nodeName?: string;
+	workflowId?: string;
+	workflowName?: string;
 }
 
 /**
@@ -42,11 +42,11 @@ export interface WebhookContext {
  * @group Models
  */
 export interface Webhook {
-    data: IDataObject & { webhookId?: string; webhookSecret?: string };
-    events: string[];
-    url?: string;
-    context: WebhookContext;
-    name: string;
+	data: IDataObject & { webhookId?: string; webhookSecret?: string };
+	events: string[];
+	url?: string;
+	context: WebhookContext;
+	name: string;
 }
 
 /**
@@ -57,5 +57,5 @@ export interface Webhook {
  * @group Models
  */
 export interface CreateWebhook extends Webhook {
-    secret?: string;
+	secret?: string;
 }

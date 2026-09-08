@@ -13,18 +13,18 @@ import { Webhook, WebhookContext, WebhookFunctions } from '../models';
  * @group Utils
  */
 function getEvents(hookData: WebhookFunctions): string[] {
-    const eventData = hookData.getNodeParameter('events', []) as {
-        event: Array<{
-            limetype: string;
-            eventType: string;
-        }>;
-    };
-    const eventItems = eventData.event;
-    const events: string[] = [];
-    for (const eventItem of eventItems) {
-        events.push(`${eventItem.limetype}.${eventItem.eventType}`);
-    }
-    return events;
+	const eventData = hookData.getNodeParameter('events', []) as {
+		event: Array<{
+			limetype: string;
+			eventType: string;
+		}>;
+	};
+	const eventItems = eventData.event;
+	const events: string[] = [];
+	for (const eventItem of eventItems) {
+		events.push(`${eventItem.limetype}.${eventItem.eventType}`);
+	}
+	return events;
 }
 
 /**
@@ -40,15 +40,15 @@ function getEvents(hookData: WebhookFunctions): string[] {
  * @group Utils
  */
 function createWebhookName(hookData: WebhookFunctions): string {
-    interface Events {
-        event: Array<{
-            limetype: string;
-            eventType: string;
-        }>;
-    }
+	interface Events {
+		event: Array<{
+			limetype: string;
+			eventType: string;
+		}>;
+	}
 
-    const events = hookData.getNodeParameter('events') as Events;
-    return `${events.event[0].limetype}-${events.event[0].eventType}-${Date.now()}`;
+	const events = hookData.getNodeParameter('events') as Events;
+	return `${events.event[0].limetype}-${events.event[0].eventType}-${Date.now()}`;
 }
 
 /**
@@ -62,20 +62,20 @@ function createWebhookName(hookData: WebhookFunctions): string {
  * @group Utils
  */
 export function getWebhook(hookData: WebhookFunctions): Webhook {
-    const node = hookData.getNode();
-    const workflow = hookData.getWorkflow();
-    const context: WebhookContext = {
-        nodeId: node.id,
-        nodeName: node.name,
-        workflowId: workflow.id,
-        workflowName: workflow.name,
-    };
+	const node = hookData.getNode();
+	const workflow = hookData.getWorkflow();
+	const context: WebhookContext = {
+		nodeId: node.id,
+		nodeName: node.name,
+		workflowId: workflow.id,
+		workflowName: workflow.name,
+	};
 
-    return {
-        data: hookData.getWorkflowStaticData('node'),
-        events: getEvents(hookData),
-        url: hookData.getNodeWebhookUrl('default'),
-        context: context,
-        name: createWebhookName(hookData),
-    };
+	return {
+		data: hookData.getWorkflowStaticData('node'),
+		events: getEvents(hookData),
+		url: hookData.getNodeWebhookUrl('default'),
+		context: context,
+		name: createWebhookName(hookData),
+	};
 }

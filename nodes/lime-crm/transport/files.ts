@@ -1,11 +1,7 @@
 import { IExecuteFunctions, IBinaryData, BINARY_ENCODING } from 'n8n-workflow';
 import { callLimeApi, prepareResponseWithoutKeys } from './commons';
 import { getLimeobject } from './limeobjects';
-import {
-    getFilenameFromHeader,
-    handleWorkflowError,
-    setFilename,
-} from '../utils';
+import { getFilenameFromHeader, handleWorkflowError, setFilename } from '../utils';
 import { APIResponse } from '../../response';
 /**
  * Endpoint path for Lime CRM file API.
@@ -25,8 +21,8 @@ const LIME_FILE_URL = '/api/v1/file/';
  * @group Transport
  */
 export interface FileApiResponse {
-    headers: Record<string, string | string[] | undefined>;
-    body: Buffer;
+	headers: Record<string, string | string[] | undefined>;
+	body: Buffer;
 }
 
 /**
@@ -46,15 +42,15 @@ export interface FileApiResponse {
  * @group Transport
  */
 export type FileMetadata = {
-    filename: string;
-    id: number;
-    size: number;
-    content_type: string;
-    extension: string;
-    created_by: number;
-    locked_by: number;
-    last_modified: string;
-    _links?: { [key: string]: { href: string } };
+	filename: string;
+	id: number;
+	size: number;
+	content_type: string;
+	extension: string;
+	created_by: number;
+	locked_by: number;
+	last_modified: string;
+	_links?: { [key: string]: { href: string } };
 };
 
 /**
@@ -68,18 +64,18 @@ export type FileMetadata = {
  * @group Transport
  */
 export async function getFileMetadata(
-    nodeContext: IExecuteFunctions,
-    id: string | number
+	nodeContext: IExecuteFunctions,
+	id: string | number,
 ): Promise<APIResponse<FileMetadata>> {
-    const url = `${LIME_FILE_URL}${id}/`;
-    const fileMetadataResponse = await callLimeApi<FileMetadata>(nodeContext, {
-        method: 'GET',
-        url: url,
-    });
+	const url = `${LIME_FILE_URL}${id}/`;
+	const fileMetadataResponse = await callLimeApi<FileMetadata>(nodeContext, {
+		method: 'GET',
+		url: url,
+	});
 
-    if (!fileMetadataResponse.success) return fileMetadataResponse;
+	if (!fileMetadataResponse.success) return fileMetadataResponse;
 
-    return prepareResponseWithoutKeys(fileMetadataResponse, ['_links']);
+	return prepareResponseWithoutKeys(fileMetadataResponse, ['_links']);
 }
 
 /**
@@ -95,32 +91,27 @@ export async function getFileMetadata(
  * @group Transport
  */
 export async function getFileMetadataByLimeobject(
-    nodeContext: IExecuteFunctions,
-    limetype: string,
-    id: string,
-    fileTypeProperty: string
+	nodeContext: IExecuteFunctions,
+	limetype: string,
+	id: string,
+	fileTypeProperty: string,
 ): Promise<APIResponse<FileMetadata>> {
-    const objectResponse = await getLimeobject(nodeContext, limetype, id);
-    if (!objectResponse.success) return objectResponse;
+	const objectResponse = await getLimeobject(nodeContext, limetype, id);
+	if (!objectResponse.success) return objectResponse;
 
-    const fileId = objectResponse.data[fileTypeProperty] as
-        | string
-        | number
-        | null
-        | undefined;
+	const fileId = objectResponse.data[fileTypeProperty] as string | number | null | undefined;
 
-    if (fileId === undefined || fileId === null || fileId === '') {
-        return handleWorkflowError(
-            nodeContext.getNode(),
-            {
-                message:
-                    'The specified Limeobject does not have an associated file',
-            },
-            true
-        );
-    }
+	if (fileId === undefined || fileId === null || fileId === '') {
+		return handleWorkflowError(
+			nodeContext.getNode(),
+			{
+				message: 'The specified Limeobject does not have an associated file',
+			},
+			true,
+		);
+	}
 
-    return await getFileMetadata(nodeContext, fileId);
+	return await getFileMetadata(nodeContext, fileId);
 }
 
 /**
@@ -134,34 +125,31 @@ export async function getFileMetadataByLimeobject(
  * @group Transport
  */
 export async function getFileContent(
-    nodeContext: IExecuteFunctions,
-    id: string | number
+	nodeContext: IExecuteFunctions,
+	id: string | number,
 ): Promise<APIResponse<IBinaryData>> {
-    const url = `${LIME_FILE_URL}${id}/contents/`;
+	const url = `${LIME_FILE_URL}${id}/contents/`;
 
-    const response = await callLimeApi<FileApiResponse>(nodeContext, {
-        method: 'GET',
-        url: url,
-        requestOptions: {
-            encoding: 'stream',
-            returnFullResponse: true,
-        },
-        json: false,
-    });
+	const response = await callLimeApi<FileApiResponse>(nodeContext, {
+		method: 'GET',
+		url: url,
+		requestOptions: {
+			encoding: 'stream',
+			returnFullResponse: true,
+		},
+		json: false,
+	});
 
-    if (!response.success) return response;
+	if (!response.success) return response;
 
-    const fileName =
-        getFilenameFromHeader(response.data.headers) || `file_${id}`;
-    const binaryData = await nodeContext.helpers.prepareBinaryData(
-        response.data.body
-    );
-    binaryData.fileName = setFilename(binaryData, fileName);
+	const fileName = getFilenameFromHeader(response.data.headers) || `file_${id}`;
+	const binaryData = await nodeContext.helpers.prepareBinaryData(response.data.body);
+	binaryData.fileName = setFilename(binaryData, fileName);
 
-    return {
-        success: true,
-        data: binaryData,
-    };
+	return {
+		success: true,
+		data: binaryData,
+	};
 }
 
 /**
@@ -177,32 +165,27 @@ export async function getFileContent(
  * @group Transport
  */
 export async function getFileContentByLimetype(
-    nodeContext: IExecuteFunctions,
-    limetype: string,
-    id: string,
-    fileTypeProperty: string
+	nodeContext: IExecuteFunctions,
+	limetype: string,
+	id: string,
+	fileTypeProperty: string,
 ): Promise<APIResponse<IBinaryData>> {
-    const limeObjectResponse = await getLimeobject(nodeContext, limetype, id);
-    if (!limeObjectResponse.success) return limeObjectResponse;
+	const limeObjectResponse = await getLimeobject(nodeContext, limetype, id);
+	if (!limeObjectResponse.success) return limeObjectResponse;
 
-    const fileId = limeObjectResponse.data[fileTypeProperty] as
-        | string
-        | number
-        | null
-        | undefined;
+	const fileId = limeObjectResponse.data[fileTypeProperty] as string | number | null | undefined;
 
-    if (fileId === undefined || fileId === null || fileId === '') {
-        return handleWorkflowError(
-            nodeContext.getNode(),
-            {
-                message:
-                    'The specified Limeobject does not have an associated file.',
-            },
-            true
-        );
-    }
+	if (fileId === undefined || fileId === null || fileId === '') {
+		return handleWorkflowError(
+			nodeContext.getNode(),
+			{
+				message: 'The specified Limeobject does not have an associated file.',
+			},
+			true,
+		);
+	}
 
-    return await getFileContent(nodeContext, fileId);
+	return await getFileContent(nodeContext, fileId);
 }
 
 /**
@@ -217,22 +200,22 @@ export async function getFileContentByLimetype(
  * @group Transport
  */
 export async function createFile(
-    nodeContext: IExecuteFunctions,
-    binary: IBinaryData,
-    fallbackFileName: string
+	nodeContext: IExecuteFunctions,
+	binary: IBinaryData,
+	fallbackFileName: string,
 ): Promise<APIResponse<FileMetadata>> {
-    const response = await callLimeApi<FileMetadata>(nodeContext, {
-        method: 'POST',
-        url: LIME_FILE_URL,
-        requestOptions: {
-            body: Buffer.from(binary.data, BINARY_ENCODING),
-            headers: {
-                'Content-Disposition': `;filename*="UTF-8''${encodeURIComponent(binary.fileName || fallbackFileName)}"`,
-                'Content-Type': binary.mimeType,
-            },
-        },
-    });
-    if (!response.success) return response;
+	const response = await callLimeApi<FileMetadata>(nodeContext, {
+		method: 'POST',
+		url: LIME_FILE_URL,
+		requestOptions: {
+			body: Buffer.from(binary.data, BINARY_ENCODING),
+			headers: {
+				'Content-Disposition': `;filename*="UTF-8''${encodeURIComponent(binary.fileName || fallbackFileName)}"`,
+				'Content-Type': binary.mimeType,
+			},
+		},
+	});
+	if (!response.success) return response;
 
-    return prepareResponseWithoutKeys(response, ['_links']);
+	return prepareResponseWithoutKeys(response, ['_links']);
 }

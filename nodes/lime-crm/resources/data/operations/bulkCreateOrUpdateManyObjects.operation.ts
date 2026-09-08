@@ -1,8 +1,5 @@
 import { IDataObject, IExecuteFunctions, INodeProperties } from 'n8n-workflow';
-import {
-    getBulkImportProperties,
-    executeBulkImport,
-} from './bulkImportCommons';
+import { getBulkImportProperties, executeBulkImport } from './bulkImportCommons';
 
 /**
  * Description and metadata for the "Create or update many objects" operation in Lime CRM.
@@ -10,11 +7,10 @@ import {
  * @public
  */
 export const description = {
-    name: 'Create or Update Many Objects (Bulk)',
-    value: 'bulkCreateOrUpdateManyObjects',
-    description:
-        'Create or update multiple objects via bulk import. Skips business logic.',
-    action: 'Create or update many objects (bulk)',
+	name: 'Create or Update Many Objects (Bulk)',
+	value: 'bulkCreateOrUpdateManyObjects',
+	description: 'Create or update multiple objects via bulk import. Skips business logic.',
+	action: 'Create or update many objects (bulk)',
 };
 
 /**
@@ -23,8 +19,8 @@ export const description = {
  * @public
  */
 export const properties: INodeProperties[] = getBulkImportProperties(
-    'bulkCreateOrUpdateManyObjects',
-    true // Matching property needed for create_or_update
+	'bulkCreateOrUpdateManyObjects',
+	true, // Matching property needed for create_or_update
 );
 
 /**
@@ -37,8 +33,8 @@ export const properties: INodeProperties[] = getBulkImportProperties(
  * @public
  */
 export async function execute(
-    this: IExecuteFunctions,
-    i: number
+	this: IExecuteFunctions,
+	i: number,
 ): Promise<IDataObject | undefined> {
-    return executeBulkImport(this, i, 'create_or_update');
+	return executeBulkImport(this, i, 'create_or_update');
 }

@@ -8,10 +8,10 @@ import { WorkflowResponse } from '../../../../response';
  * Description and metadata for the "Get All Limetypes" operation in Lime CRM.
  */
 export const description = {
-    name: 'Get all Limetypes',
-    value: 'getAllLimetypes',
-    description: 'Get a list of all available Limetypes',
-    action: 'Get all Limetypes',
+	name: 'Get all Limetypes',
+	value: 'getAllLimetypes',
+	description: 'Get a list of all available Limetypes',
+	action: 'Get all Limetypes',
 };
 
 /**
@@ -24,9 +24,7 @@ export const description = {
  *
  * @public
  */
-export async function execute(
-    this: IExecuteFunctions
-): Promise<WorkflowResponse<Limetype[]>> {
-    const response = await getLimetypesFromApi(this);
-    return response.data;
+export async function execute(this: IExecuteFunctions): Promise<WorkflowResponse<Limetype[]>> {
+	const response = await getLimetypesFromApi(this);
+	return response.data;
 }

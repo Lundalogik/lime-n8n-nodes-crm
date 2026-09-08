@@ -1,9 +1,9 @@
 import {
-    ICredentialType,
-    INodeProperties,
-    IHttpRequestMethods,
-    IAuthenticate,
-    ICredentialTestRequest,
+	ICredentialType,
+	INodeProperties,
+	IHttpRequestMethods,
+	IAuthenticate,
+	ICredentialTestRequest,
 } from 'n8n-workflow';
 
 import { LIME_CRM_API_CREDENTIAL_KEY } from '../nodes';
@@ -41,52 +41,52 @@ import { LIME_CRM_API_CREDENTIAL_KEY } from '../nodes';
  * @public
  */
 export class LimeCrmApi implements ICredentialType {
-    name = LIME_CRM_API_CREDENTIAL_KEY;
-    displayName = 'Lime CRM API';
-    documentationUrl = 'https://lime-crm.com/api-docs/';
-    icon = 'file:assets/lime-crm.svg' as const;
-    properties: INodeProperties[] = [
-        {
-            displayName: 'Server URL',
-            name: 'url',
-            type: 'string',
-            default: '',
-            placeholder: 'https://instance.lime-crm.com/instance-name',
-            required: true,
-            description: 'The URL of your Lime CRM instance',
-        },
-        {
-            displayName: 'API Key',
-            name: 'apiKey',
-            type: 'string',
-            typeOptions: {
-                password: true,
-            },
-            default: '',
-            required: true,
-            description: 'The API key obtained from Lime CRM',
-        },
-    ];
+	name = LIME_CRM_API_CREDENTIAL_KEY;
+	displayName = 'Lime CRM API';
+	documentationUrl = 'https://lime-crm.com/api-docs/';
+	icon = 'file:assets/lime-crm.svg' as const;
+	properties: INodeProperties[] = [
+		{
+			displayName: 'Server URL',
+			name: 'url',
+			type: 'string',
+			default: '',
+			placeholder: 'https://instance.lime-crm.com/instance-name',
+			required: true,
+			description: 'The URL of your Lime CRM instance',
+		},
+		{
+			displayName: 'API Key',
+			name: 'apiKey',
+			type: 'string',
+			typeOptions: {
+				password: true,
+			},
+			default: '',
+			required: true,
+			description: 'The API key obtained from Lime CRM',
+		},
+	];
 
-    authenticate: IAuthenticate = {
-        type: 'generic',
-        properties: {
-            headers: {
-                // Ensure the header name matches exactly what the Lime CRM API expects
-                'X-API-Key': '={{$credentials.apiKey}}',
-            },
-        },
-    };
+	authenticate: IAuthenticate = {
+		type: 'generic',
+		properties: {
+			headers: {
+				// Ensure the header name matches exactly what the Lime CRM API expects
+				'X-API-Key': '={{$credentials.apiKey}}',
+			},
+		},
+	};
 
-    test: ICredentialTestRequest = {
-        request: {
-            baseURL: '={{$credentials.url}}'.replace('/+$', ''),
-            url: '/api/v1/',
-            method: 'GET' as IHttpRequestMethods,
-            headers: {
-                'X-API-Key': '={{$credentials.apiKey}}',
-                Accept: 'application/json',
-            },
-        },
-    };
+	test: ICredentialTestRequest = {
+		request: {
+			baseURL: '={{$credentials.url}}'.replace('/+$', ''),
+			url: '/api/v1/',
+			method: 'GET' as IHttpRequestMethods,
+			headers: {
+				'X-API-Key': '={{$credentials.apiKey}}',
+				Accept: 'application/json',
+			},
+		},
+	};
 }

@@ -2,7 +2,7 @@ import { FieldType, IDataObject, ResourceMapperField } from 'n8n-workflow';
 import { SerializerFn, SerializedValue, SerializerError } from './commons';
 
 interface ResourceMapperFieldMap {
-    [id: string]: FieldType;
+	[id: string]: FieldType;
 }
 
 /**
@@ -20,16 +20,14 @@ interface ResourceMapperFieldMap {
  * @returns The ISO 8601 formatted string representation of the datetime.
  */
 const serializeDatetime: SerializerFn = (value) => {
-    if (typeof value !== 'string') {
-        throw new SerializerError(
-            `Expected string as dateTime, got ${typeof value}`
-        );
-    }
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) {
-        throw new SerializerError(`Invalid date value: ${String(value)}`);
-    }
-    return date.toISOString();
+	if (typeof value !== 'string') {
+		throw new SerializerError(`Expected string as dateTime, got ${typeof value}`);
+	}
+	const date = new Date(value);
+	if (Number.isNaN(date.getTime())) {
+		throw new SerializerError(`Invalid date value: ${String(value)}`);
+	}
+	return date.toISOString();
 };
 
 /**
@@ -38,7 +36,7 @@ const serializeDatetime: SerializerFn = (value) => {
  * logic for serializing their values.
  */
 const SerializerMap: Partial<Record<FieldType, SerializerFn>> = {
-    dateTime: serializeDatetime,
+	dateTime: serializeDatetime,
 };
 
 /**
@@ -54,12 +52,9 @@ const SerializerMap: Partial<Record<FieldType, SerializerFn>> = {
  * @returns - The serialized value or the original value if no
  *                                serializer is found.
  */
-const getSerializedValue = (
-    value: SerializedValue,
-    type: FieldType
-): SerializedValue => {
-    const serializer = SerializerMap[type];
-    return serializer === undefined ? value : serializer(value);
+const getSerializedValue = (value: SerializedValue, type: FieldType): SerializedValue => {
+	const serializer = SerializerMap[type];
+	return serializer === undefined ? value : serializer(value);
 };
 
 /**
@@ -69,16 +64,14 @@ const getSerializedValue = (
  * @param schema - The input array of resource mapper fields.
  * @returns An object mapping each field ID to its corresponding type.
  */
-const fetchResourceMapperFieldMap = (
-    schema: ResourceMapperField[]
-): ResourceMapperFieldMap => {
-    const resourceMapperFieldMap: ResourceMapperFieldMap = {};
-    for (const field of schema) {
-        if (field.type) {
-            resourceMapperFieldMap[field.id] = field.type;
-        }
-    }
-    return resourceMapperFieldMap;
+const fetchResourceMapperFieldMap = (schema: ResourceMapperField[]): ResourceMapperFieldMap => {
+	const resourceMapperFieldMap: ResourceMapperFieldMap = {};
+	for (const field of schema) {
+		if (field.type) {
+			resourceMapperFieldMap[field.id] = field.type;
+		}
+	}
+	return resourceMapperFieldMap;
 };
 
 /**
@@ -92,19 +85,18 @@ const fetchResourceMapperFieldMap = (
  * @returns The serialized representation of the resource values, structured according to the provided schema.
  */
 export const serializeResourceMapperValues = (
-    resourceMapperValues: IDataObject,
-    resourceMapperSchema: ResourceMapperField[]
+	resourceMapperValues: IDataObject,
+	resourceMapperSchema: ResourceMapperField[],
 ): IDataObject => {
-    const serializedData: IDataObject = {};
-    const resourceMapperFieldMap =
-        fetchResourceMapperFieldMap(resourceMapperSchema);
-    for (const resourceMapperValue in resourceMapperValues) {
-        if (resourceMapperValues[resourceMapperValue] !== undefined) {
-            serializedData[resourceMapperValue] = getSerializedValue(
-                resourceMapperValues[resourceMapperValue],
-                resourceMapperFieldMap[resourceMapperValue]
-            );
-        }
-    }
-    return serializedData;
+	const serializedData: IDataObject = {};
+	const resourceMapperFieldMap = fetchResourceMapperFieldMap(resourceMapperSchema);
+	for (const resourceMapperValue in resourceMapperValues) {
+		if (resourceMapperValues[resourceMapperValue] !== undefined) {
+			serializedData[resourceMapperValue] = getSerializedValue(
+				resourceMapperValues[resourceMapperValue],
+				resourceMapperFieldMap[resourceMapperValue],
+			);
+		}
+	}
+	return serializedData;
 };

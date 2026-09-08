@@ -24,9 +24,9 @@ export type SerializerFn = (value: GenericValue) => SerializedValue;
  * Custom error class for serialization errors.
  */
 export class SerializerError extends Error {
-    constructor(message: string) {
-        super(message);
-        this.name = 'SerializerError';
-        Object.setPrototypeOf(this, SerializerError.prototype);
-    }
+	constructor(message: string) {
+		super(message);
+		this.name = 'SerializerError';
+		Object.setPrototypeOf(this, SerializerError.prototype);
+	}
 }

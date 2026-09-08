@@ -9,10 +9,10 @@ import { WorkflowResponse } from '../../../../response';
  * @public
  */
 export const description = {
-    name: 'Get a Limetype',
-    value: 'getSingleLimetype',
-    description: 'Get details about a specific Limetype',
-    action: 'Get a Limetype',
+	name: 'Get a Limetype',
+	value: 'getSingleLimetype',
+	description: 'Get details about a specific Limetype',
+	action: 'Get a Limetype',
 };
 
 /**
@@ -23,37 +23,37 @@ export const description = {
  * @public
  */
 export const properties: INodeProperties[] = [
-    {
-        displayName: 'Limetype',
-        name: 'limetype',
-        type: 'resourceLocator',
-        default: { mode: 'list', value: '' },
-        required: true,
-        description: 'The name of the entity type to get details for',
-        modes: [
-            {
-                displayName: 'From List',
-                name: 'list',
-                type: 'list',
-                typeOptions: {
-                    searchListMethod: 'searchLimetypes',
-                    searchable: true,
-                },
-            },
-            {
-                displayName: 'By Name',
-                name: 'name',
-                type: 'string',
-                placeholder: 'e.g. company',
-            },
-        ],
-        displayOptions: {
-            show: {
-                resource: [METADATA_RESOURCE],
-                operation: ['getSingleLimetype'],
-            },
-        },
-    },
+	{
+		displayName: 'Limetype',
+		name: 'limetype',
+		type: 'resourceLocator',
+		default: { mode: 'list', value: '' },
+		required: true,
+		description: 'The name of the entity type to get details for',
+		modes: [
+			{
+				displayName: 'From List',
+				name: 'list',
+				type: 'list',
+				typeOptions: {
+					searchListMethod: 'searchLimetypes',
+					searchable: true,
+				},
+			},
+			{
+				displayName: 'By Name',
+				name: 'name',
+				type: 'string',
+				placeholder: 'e.g. company',
+			},
+		],
+		displayOptions: {
+			show: {
+				resource: [METADATA_RESOURCE],
+				operation: ['getSingleLimetype'],
+			},
+		},
+	},
 ];
 
 /**
@@ -67,13 +67,13 @@ export const properties: INodeProperties[] = [
  * @public
  */
 export async function execute(
-    this: IExecuteFunctions,
-    i: number
+	this: IExecuteFunctions,
+	i: number,
 ): Promise<WorkflowResponse<Limetype>> {
-    const limetype = this.getNodeParameter('limetype', i, undefined, {
-        extractValue: true,
-    }) as string;
+	const limetype = this.getNodeParameter('limetype', i, undefined, {
+		extractValue: true,
+	}) as string;
 
-    const response = await getLimetype(this, limetype);
-    return response.data;
+	const response = await getLimetype(this, limetype);
+	return response.data;
 }

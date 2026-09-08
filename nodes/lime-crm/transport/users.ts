@@ -1,16 +1,6 @@
 import { callLimeApi } from './commons';
-import {
-    IAllExecuteFunctions,
-    LoggerProxy as Logger,
-    NodeApiError,
-} from 'n8n-workflow';
-import {
-    User,
-    UserType,
-    DEFAULT_API_OBJECT_LIMIT,
-    NullOptionType,
-    Limetype,
-} from '../models';
+import { IAllExecuteFunctions, LoggerProxy as Logger, NodeApiError } from 'n8n-workflow';
+import { User, UserType, DEFAULT_API_OBJECT_LIMIT, NullOptionType, Limetype } from '../models';
 import { getLimetypesFromApi } from './limetypes';
 import { queryLimeobjects, QueryResponse } from './limeQuery';
 import { getLimeobject } from './limeobjects';
@@ -19,9 +9,9 @@ import { handleWorkflowError } from '../../errorHandling';
 const USERS_URL = 'api/v1/admin/users/';
 
 type UserQueryParameters = {
-    active?: boolean;
-    user_type?: UserType;
-    _limit: number;
+	active?: boolean;
+	user_type?: UserType;
+	_limit: number;
 };
 
 /**
@@ -33,16 +23,16 @@ type UserQueryParameters = {
  * @internal
  */
 function findCoworkerLimetype(limetypes: Limetype[]): Limetype | undefined {
-    for (const limetype of limetypes) {
-        for (const property of limetype.properties) {
-            if (property.type === 'user') {
-                Logger.info('Found coworker limetype');
-                return limetype;
-            }
-        }
-    }
-    Logger.warn('No coworker limetype found');
-    return undefined;
+	for (const limetype of limetypes) {
+		for (const property of limetype.properties) {
+			if (property.type === 'user') {
+				Logger.info('Found coworker limetype');
+				return limetype;
+			}
+		}
+	}
+	Logger.warn('No coworker limetype found');
+	return undefined;
 }
 
 /**
@@ -53,27 +43,25 @@ function findCoworkerLimetype(limetypes: Limetype[]): Limetype | undefined {
  * @throws NodeApiError if no coworker limetype is found
  * @internal
  */
-async function findCoworker(
-    nodeContext: IAllExecuteFunctions
-): Promise<APIResponse<Limetype>> {
-    const response = await getLimetypesFromApi(nodeContext);
-    if (!response.success) {
-        return response;
-    }
-    const coworker = findCoworkerLimetype(response.data);
-    if (!coworker) {
-        return handleWorkflowError(
-            nodeContext.getNode(),
-            {
-                message: `No limetype with 'user' property found to get coworker`,
-            },
-            true
-        );
-    }
-    return {
-        success: true,
-        data: coworker,
-    };
+async function findCoworker(nodeContext: IAllExecuteFunctions): Promise<APIResponse<Limetype>> {
+	const response = await getLimetypesFromApi(nodeContext);
+	if (!response.success) {
+		return response;
+	}
+	const coworker = findCoworkerLimetype(response.data);
+	if (!coworker) {
+		return handleWorkflowError(
+			nodeContext.getNode(),
+			{
+				message: `No limetype with 'user' property found to get coworker`,
+			},
+			true,
+		);
+	}
+	return {
+		success: true,
+		data: coworker,
+	};
 }
 
 /**
@@ -87,41 +75,37 @@ async function findCoworker(
  * @internal
  */
 async function getCoworker(
-    nodeContext: IAllExecuteFunctions,
-    coworker: Limetype,
-    userId: string | number
+	nodeContext: IAllExecuteFunctions,
+	coworker: Limetype,
+	userId: string | number,
 ): Promise<APIResponse<QueryResponse>> {
-    // 'hasmany' properties are not supported in the response format of Lime Query API
-    const properties = Object.fromEntries(
-        coworker.properties
-            .filter((prop) => prop.type !== 'hasmany')
-            .map((prop) => [prop.name, ''])
-    );
+	// 'hasmany' properties are not supported in the response format of Lime Query API
+	const properties = Object.fromEntries(
+		coworker.properties.filter((prop) => prop.type !== 'hasmany').map((prop) => [prop.name, '']),
+	);
 
-    const userProperty = coworker.properties.find(
-        (prop) => prop.type === 'user'
-    );
-    if (!userProperty) {
-        throw new NodeApiError(nodeContext.getNode(), {
-            message: `No property of type 'user' found in ${coworker.name} limetype`,
-        });
-    }
+	const userProperty = coworker.properties.find((prop) => prop.type === 'user');
+	if (!userProperty) {
+		throw new NodeApiError(nodeContext.getNode(), {
+			message: `No property of type 'user' found in ${coworker.name} limetype`,
+		});
+	}
 
-    const responseFormat = {
-        object: properties,
-    };
-    const filter = {
-        key: userProperty.name,
-        op: '=',
-        exp: userId,
-    };
-    const q = JSON.stringify({
-        limetype: coworker.name,
-        responseFormat: responseFormat,
-        filter: filter,
-    });
+	const responseFormat = {
+		object: properties,
+	};
+	const filter = {
+		key: userProperty.name,
+		op: '=',
+		exp: userId,
+	};
+	const q = JSON.stringify({
+		limetype: coworker.name,
+		responseFormat: responseFormat,
+		filter: filter,
+	});
 
-    return await queryLimeobjects(nodeContext, q);
+	return await queryLimeobjects(nodeContext, q);
 }
 
 /**
@@ -139,55 +123,51 @@ async function getCoworker(
  */
 
 export async function fetchManyUsers(
-    nodeContext: IAllExecuteFunctions,
-    active: boolean | NullOptionType = '',
-    userType: UserType | NullOptionType = '',
-    limit: number = DEFAULT_API_OBJECT_LIMIT,
-    withCoworker: boolean = false
+	nodeContext: IAllExecuteFunctions,
+	active: boolean | NullOptionType = '',
+	userType: UserType | NullOptionType = '',
+	limit: number = DEFAULT_API_OBJECT_LIMIT,
+	withCoworker: boolean = false,
 ): Promise<APIResponse<User[]>> {
-    const queryParams: UserQueryParameters = {
-        _limit: limit,
-    };
-    if (active !== '') {
-        queryParams.active = active;
-    }
-    if (userType !== '') {
-        queryParams.user_type = userType;
-    }
+	const queryParams: UserQueryParameters = {
+		_limit: limit,
+	};
+	if (active !== '') {
+		queryParams.active = active;
+	}
+	if (userType !== '') {
+		queryParams.user_type = userType;
+	}
 
-    const response = await callLimeApi<User[]>(nodeContext, {
-        method: 'GET',
-        url: USERS_URL,
-        requestOptions: {
-            qs: queryParams,
-        },
-    });
+	const response = await callLimeApi<User[]>(nodeContext, {
+		method: 'GET',
+		url: USERS_URL,
+		requestOptions: {
+			qs: queryParams,
+		},
+	});
 
-    if (!response.success || !withCoworker) return response;
+	if (!response.success || !withCoworker) return response;
 
-    const coworkerLimetypeResponse = await findCoworker(nodeContext);
-    if (!coworkerLimetypeResponse.success) return coworkerLimetypeResponse;
+	const coworkerLimetypeResponse = await findCoworker(nodeContext);
+	if (!coworkerLimetypeResponse.success) return coworkerLimetypeResponse;
 
-    const coworkerLimetype = coworkerLimetypeResponse.data;
+	const coworkerLimetype = coworkerLimetypeResponse.data;
 
-    const usersWithCoworkers: User[] = [];
-    for (const user of response.data) {
-        const coworkerResponse = await getCoworker(
-            nodeContext,
-            coworkerLimetype,
-            user.id
-        );
-        if (!coworkerResponse.success) return coworkerResponse;
-        usersWithCoworkers.push({
-            ...user,
-            [coworkerLimetype.name]: coworkerResponse.data.objects[0] || null,
-        });
-    }
+	const usersWithCoworkers: User[] = [];
+	for (const user of response.data) {
+		const coworkerResponse = await getCoworker(nodeContext, coworkerLimetype, user.id);
+		if (!coworkerResponse.success) return coworkerResponse;
+		usersWithCoworkers.push({
+			...user,
+			[coworkerLimetype.name]: coworkerResponse.data.objects[0] || null,
+		});
+	}
 
-    return {
-        success: true,
-        data: usersWithCoworkers,
-    };
+	return {
+		success: true,
+		data: usersWithCoworkers,
+	};
 }
 
 /**
@@ -203,38 +183,33 @@ export async function fetchManyUsers(
  */
 
 export async function fetchSingleUserById(
-    nodeContext: IAllExecuteFunctions,
-    id: string,
-    withCoworker: boolean = false
+	nodeContext: IAllExecuteFunctions,
+	id: string,
+	withCoworker: boolean = false,
 ): Promise<APIResponse<User>> {
-    const url = `${USERS_URL}${id}`;
-    const userResponse = await callLimeApi<User>(nodeContext, {
-        method: 'GET',
-        url: url,
-        errorMetadata: {
-            user_id: id,
-        },
-    });
+	const url = `${USERS_URL}${id}`;
+	const userResponse = await callLimeApi<User>(nodeContext, {
+		method: 'GET',
+		url: url,
+		errorMetadata: {
+			user_id: id,
+		},
+	});
 
-    if (!userResponse.success || !withCoworker) return userResponse;
-    const coworkerLimetypeResponse = await findCoworker(nodeContext);
-    if (!coworkerLimetypeResponse.success) return coworkerLimetypeResponse;
+	if (!userResponse.success || !withCoworker) return userResponse;
+	const coworkerLimetypeResponse = await findCoworker(nodeContext);
+	if (!coworkerLimetypeResponse.success) return coworkerLimetypeResponse;
 
-    const coworkerResponse = await getCoworker(
-        nodeContext,
-        coworkerLimetypeResponse.data,
-        id
-    );
-    if (!coworkerResponse.success) return coworkerResponse;
+	const coworkerResponse = await getCoworker(nodeContext, coworkerLimetypeResponse.data, id);
+	if (!coworkerResponse.success) return coworkerResponse;
 
-    return {
-        success: true,
-        data: {
-            ...userResponse.data,
-            [coworkerLimetypeResponse.data.name]:
-                coworkerResponse.data.objects[0] || null,
-        },
-    };
+	return {
+		success: true,
+		data: {
+			...userResponse.data,
+			[coworkerLimetypeResponse.data.name]: coworkerResponse.data.objects[0] || null,
+		},
+	};
 }
 
 /**
@@ -253,51 +228,45 @@ export async function fetchSingleUserById(
  * @group Transport
  */
 export async function fetchSingleUserByLimeobjectId(
-    nodeContext: IAllExecuteFunctions,
-    id: string,
-    withCoworker: boolean = false
+	nodeContext: IAllExecuteFunctions,
+	id: string,
+	withCoworker: boolean = false,
 ): Promise<APIResponse<User>> {
-    const coworkerLimetypeResponse = await findCoworker(nodeContext);
-    if (!coworkerLimetypeResponse.success) return coworkerLimetypeResponse;
+	const coworkerLimetypeResponse = await findCoworker(nodeContext);
+	if (!coworkerLimetypeResponse.success) return coworkerLimetypeResponse;
 
-    const coworkerLimetype = coworkerLimetypeResponse.data;
+	const coworkerLimetype = coworkerLimetypeResponse.data;
 
-    const coworkerResponse = await getLimeobject(
-        nodeContext,
-        coworkerLimetype.name,
-        id
-    );
-    if (!coworkerResponse.success) return coworkerResponse;
+	const coworkerResponse = await getLimeobject(nodeContext, coworkerLimetype.name, id);
+	if (!coworkerResponse.success) return coworkerResponse;
 
-    const userProperty = coworkerLimetype.properties.find(
-        (prop) => prop.type === 'user'
-    );
-    if (!userProperty) {
-        return handleWorkflowError(
-            nodeContext.getNode(),
-            {
-                message: `No property of type 'user' found in ${coworkerLimetype.name} limetype`,
-            },
-            true
-        );
-    }
+	const userProperty = coworkerLimetype.properties.find((prop) => prop.type === 'user');
+	if (!userProperty) {
+		return handleWorkflowError(
+			nodeContext.getNode(),
+			{
+				message: `No property of type 'user' found in ${coworkerLimetype.name} limetype`,
+			},
+			true,
+		);
+	}
 
-    const url = `${USERS_URL}${coworkerResponse.data[userProperty.name]}`;
-    const userResponse = await callLimeApi<User>(nodeContext, {
-        method: 'GET',
-        url: url,
-        errorMetadata: {
-            user_id: id,
-        },
-    });
+	const url = `${USERS_URL}${coworkerResponse.data[userProperty.name]}`;
+	const userResponse = await callLimeApi<User>(nodeContext, {
+		method: 'GET',
+		url: url,
+		errorMetadata: {
+			user_id: id,
+		},
+	});
 
-    if (!userResponse.success || !withCoworker) return userResponse;
+	if (!userResponse.success || !withCoworker) return userResponse;
 
-    return {
-        success: true,
-        data: {
-            ...userResponse.data,
-            [coworkerLimetype.name]: coworkerResponse.data || null,
-        },
-    };
+	return {
+		success: true,
+		data: {
+			...userResponse.data,
+			[coworkerLimetype.name]: coworkerResponse.data || null,
+		},
+	};
 }

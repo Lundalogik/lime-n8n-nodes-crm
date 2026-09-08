@@ -1,9 +1,9 @@
 import {
-    INodeExecutionData,
-    IExecuteFunctions,
-    INodeProperties,
-    NodePropertyTypes,
-    NodeOperationError,
+	INodeExecutionData,
+	IExecuteFunctions,
+	INodeProperties,
+	NodePropertyTypes,
+	NodeOperationError,
 } from 'n8n-workflow';
 
 import * as operations from './operations';
@@ -15,15 +15,15 @@ import { N8NOperationModuleHandler } from '../../../modules';
  * List of modules consisting data operations
  */
 const moduleHandler = new N8NOperationModuleHandler([
-    operations.createSingleObject,
-    operations.getSingleObject,
-    operations.updateSingleObject,
-    operations.deleteSingleObject,
-    operations.getManyObjects,
-    operations.getSingleFile,
-    operations.bulkCreateManyObjects,
-    operations.bulkUpdateManyObjects,
-    operations.bulkCreateOrUpdateManyObjects,
+	operations.createSingleObject,
+	operations.getSingleObject,
+	operations.updateSingleObject,
+	operations.deleteSingleObject,
+	operations.getManyObjects,
+	operations.getSingleFile,
+	operations.bulkCreateManyObjects,
+	operations.bulkUpdateManyObjects,
+	operations.bulkCreateOrUpdateManyObjects,
 ]);
 
 /**
@@ -44,21 +44,21 @@ const moduleHandler = new N8NOperationModuleHandler([
  * @see {@link getSingleFile} - Operation to retrieve a single from Lime CRM
  */
 export const dataFields: INodeProperties[] = [
-    {
-        displayName: 'Operation',
-        name: 'operation',
-        type: 'options' as NodePropertyTypes,
-        noDataExpression: true,
-        displayOptions: {
-            show: {
-                resource: [DATA_RESOURCE],
-            },
-        },
-        options: moduleHandler.getDescriptions(),
-        default: 'getManyObjects',
-    },
+	{
+		displayName: 'Operation',
+		name: 'operation',
+		type: 'options' as NodePropertyTypes,
+		noDataExpression: true,
+		displayOptions: {
+			show: {
+				resource: [DATA_RESOURCE],
+			},
+		},
+		options: moduleHandler.getDescriptions(),
+		default: 'getManyObjects',
+	},
 
-    ...moduleHandler.getProperties(),
+	...moduleHandler.getProperties(),
 ];
 
 /**
@@ -76,76 +76,57 @@ export const dataFields: INodeProperties[] = [
  * @group Resources
  */
 export async function dataOperations(
-    this: IExecuteFunctions,
-    { operation, i }: { operation: string; i: number }
+	this: IExecuteFunctions,
+	{ operation, i }: { operation: string; i: number },
 ): Promise<INodeExecutionData | INodeExecutionData[] | undefined> {
-    switch (operation) {
-        case 'createSingleObject': {
-            return {
-                json: await operations.createSingleObject.execute.call(this, i),
-            };
-        }
-        case 'getSingleObject': {
-            return await operations.getSingleObject.execute.call(this, i);
-        }
-        case 'updateSingleObject': {
-            return {
-                ...(await operations.updateSingleObject.execute.call(this, i)),
-            };
-        }
-        case 'deleteSingleObject': {
-            const response = await operations.deleteSingleObject.execute.call(
-                this,
-                i
-            );
-            return { json: response };
-        }
-        case 'getManyObjects': {
-            const result = await operations.getManyObjects.execute.call(
-                this,
-                i
-            );
-            if (Array.isArray(result)) {
-                return result.map((item) => ({
-                    json: item,
-                }));
-            } else {
-                return {
-                    json: result,
-                };
-            }
-        }
-        case 'getSingleFile': {
-            return await operations.getSingleFile.execute.call(this, i);
-        }
-        case 'bulkCreateManyObjects': {
-            const result = await operations.bulkCreateManyObjects.execute.call(
-                this,
-                i
-            );
-            return result && { json: result };
-        }
-        case 'bulkUpdateManyObjects': {
-            const result = await operations.bulkUpdateManyObjects.execute.call(
-                this,
-                i
-            );
-            return result && { json: result };
-        }
-        case 'bulkCreateOrUpdateManyObjects': {
-            const result =
-                await operations.bulkCreateOrUpdateManyObjects.execute.call(
-                    this,
-                    i
-                );
-            return result && { json: result };
-        }
-    }
+	switch (operation) {
+		case 'createSingleObject': {
+			return {
+				json: await operations.createSingleObject.execute.call(this, i),
+			};
+		}
+		case 'getSingleObject': {
+			return await operations.getSingleObject.execute.call(this, i);
+		}
+		case 'updateSingleObject': {
+			return {
+				...(await operations.updateSingleObject.execute.call(this, i)),
+			};
+		}
+		case 'deleteSingleObject': {
+			const response = await operations.deleteSingleObject.execute.call(this, i);
+			return { json: response };
+		}
+		case 'getManyObjects': {
+			const result = await operations.getManyObjects.execute.call(this, i);
+			if (Array.isArray(result)) {
+				return result.map((item) => ({
+					json: item,
+				}));
+			} else {
+				return {
+					json: result,
+				};
+			}
+		}
+		case 'getSingleFile': {
+			return await operations.getSingleFile.execute.call(this, i);
+		}
+		case 'bulkCreateManyObjects': {
+			const result = await operations.bulkCreateManyObjects.execute.call(this, i);
+			return result && { json: result };
+		}
+		case 'bulkUpdateManyObjects': {
+			const result = await operations.bulkUpdateManyObjects.execute.call(this, i);
+			return result && { json: result };
+		}
+		case 'bulkCreateOrUpdateManyObjects': {
+			const result = await operations.bulkCreateOrUpdateManyObjects.execute.call(this, i);
+			return result && { json: result };
+		}
+	}
 
-    throw new NodeOperationError(
-        this.getNode(),
-        `The operation "${operation}" is not supported!`
-    );
+	throw new NodeOperationError(this.getNode(), `The operation "${operation}" is not supported!`);
 }
 
 export * from './operations';

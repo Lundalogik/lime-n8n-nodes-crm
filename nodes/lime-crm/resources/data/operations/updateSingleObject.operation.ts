@@ -1,11 +1,7 @@
 import { IDataObject, IExecuteFunctions, INodeProperties } from 'n8n-workflow';
 import { getProperties, updateLimeobject } from '../../../transport';
 import { DATA_RESOURCE, Limeobject } from '../../../models';
-import {
-    getFilePropertiesNames,
-    processFileResponse,
-    setFileProperties,
-} from '../../../utils';
+import { getFilePropertiesNames, processFileResponse, setFileProperties } from '../../../utils';
 import { WorkflowFileResponse } from '../../../../response';
 import { parseResourceMapperFields } from '../../../methods';
 
@@ -15,10 +11,10 @@ import { parseResourceMapperFields } from '../../../methods';
  * @public
  */
 export const description = {
-    name: 'Update an Object',
-    value: 'updateSingleObject',
-    description: 'Update one specific object',
-    action: 'Update an object',
+	name: 'Update an Object',
+	value: 'updateSingleObject',
+	description: 'Update one specific object',
+	action: 'Update an object',
 };
 
 /**
@@ -33,120 +29,119 @@ export const description = {
  * @public
  */
 export const properties: INodeProperties[] = [
-    {
-        displayName: 'Limetype',
-        name: 'limetype',
-        type: 'resourceLocator',
-        default: { mode: 'list', value: '' },
-        required: true,
-        description: 'The type of entity to update',
-        modes: [
-            {
-                displayName: 'From List',
-                name: 'list',
-                type: 'list',
-                typeOptions: {
-                    searchListMethod: 'searchLimetypes',
-                    searchable: true,
-                },
-            },
-            {
-                displayName: 'By Name',
-                name: 'name',
-                type: 'string',
-                placeholder: 'e.g. company',
-            },
-        ],
-        displayOptions: {
-            show: {
-                resource: [DATA_RESOURCE],
-                operation: ['updateSingleObject'],
-            },
-        },
-    },
-    {
-        displayName: 'Record ID',
-        name: 'id',
-        type: 'string',
-        required: true,
-        default: '',
-        description: 'ID of the record to update',
-        displayOptions: {
-            show: {
-                resource: [DATA_RESOURCE],
-                operation: ['updateSingleObject'],
-            },
-        },
-    },
-    {
-        displayName: 'Input',
-        name: 'inputType',
-        type: 'options',
-        options: [
-            {
-                name: 'Form',
-                value: 'fields',
-                description: 'Define fields using the UI',
-            },
-            {
-                name: 'JSON Object',
-                value: 'json',
-                description: 'Define fields using JSON',
-            },
-        ],
-        default: 'fields',
-        description: 'How to input the data',
-        displayOptions: {
-            show: {
-                resource: [DATA_RESOURCE],
-                operation: ['updateSingleObject'],
-            },
-        },
-    },
-    {
-        displayName: 'Input (JSON)',
-        name: 'jsonData',
-        type: 'json',
-        default:
-            '{\n  "name": "Updated Company Name",\n  "phone": "+987654321"\n}',
-        description:
-            'Key-value pairs for fields to update. Property names must match the Lime CRM field names.',
-        typeOptions: {
-            alwaysOpenEditWindow: true,
-        },
-        displayOptions: {
-            show: {
-                resource: [DATA_RESOURCE],
-                operation: ['updateSingleObject'],
-                inputType: ['json'],
-            },
-        },
-    },
-    {
-        displayName: 'Input (Form)',
-        name: 'properties',
-        type: 'resourceMapper',
-        placeholder: 'Add Property',
-        typeOptions: {
-            resourceMapper: {
-                resourceMapperMethod: 'getUpdateMappingColumns',
-                mode: 'add',
-                addAllFields: false,
-                supportAutoMap: false,
-            },
-            loadOptionsDependsOn: ['limetype.value'],
-        },
-        default: {
-            value: null,
-        },
-        displayOptions: {
-            show: {
-                resource: [DATA_RESOURCE],
-                operation: ['updateSingleObject'],
-                inputType: ['fields'],
-            },
-        },
-    },
+	{
+		displayName: 'Limetype',
+		name: 'limetype',
+		type: 'resourceLocator',
+		default: { mode: 'list', value: '' },
+		required: true,
+		description: 'The type of entity to update',
+		modes: [
+			{
+				displayName: 'From List',
+				name: 'list',
+				type: 'list',
+				typeOptions: {
+					searchListMethod: 'searchLimetypes',
+					searchable: true,
+				},
+			},
+			{
+				displayName: 'By Name',
+				name: 'name',
+				type: 'string',
+				placeholder: 'e.g. company',
+			},
+		],
+		displayOptions: {
+			show: {
+				resource: [DATA_RESOURCE],
+				operation: ['updateSingleObject'],
+			},
+		},
+	},
+	{
+		displayName: 'Record ID',
+		name: 'id',
+		type: 'string',
+		required: true,
+		default: '',
+		description: 'ID of the record to update',
+		displayOptions: {
+			show: {
+				resource: [DATA_RESOURCE],
+				operation: ['updateSingleObject'],
+			},
+		},
+	},
+	{
+		displayName: 'Input',
+		name: 'inputType',
+		type: 'options',
+		options: [
+			{
+				name: 'Form',
+				value: 'fields',
+				description: 'Define fields using the UI',
+			},
+			{
+				name: 'JSON Object',
+				value: 'json',
+				description: 'Define fields using JSON',
+			},
+		],
+		default: 'fields',
+		description: 'How to input the data',
+		displayOptions: {
+			show: {
+				resource: [DATA_RESOURCE],
+				operation: ['updateSingleObject'],
+			},
+		},
+	},
+	{
+		displayName: 'Input (JSON)',
+		name: 'jsonData',
+		type: 'json',
+		default: '{\n  "name": "Updated Company Name",\n  "phone": "+987654321"\n}',
+		description:
+			'Key-value pairs for fields to update. Property names must match the Lime CRM field names.',
+		typeOptions: {
+			alwaysOpenEditWindow: true,
+		},
+		displayOptions: {
+			show: {
+				resource: [DATA_RESOURCE],
+				operation: ['updateSingleObject'],
+				inputType: ['json'],
+			},
+		},
+	},
+	{
+		displayName: 'Input (Form)',
+		name: 'properties',
+		type: 'resourceMapper',
+		placeholder: 'Add Property',
+		typeOptions: {
+			resourceMapper: {
+				resourceMapperMethod: 'getUpdateMappingColumns',
+				mode: 'add',
+				addAllFields: false,
+				supportAutoMap: false,
+			},
+			loadOptionsDependsOn: ['limetype.value'],
+		},
+		default: {
+			value: null,
+		},
+		displayOptions: {
+			show: {
+				resource: [DATA_RESOURCE],
+				operation: ['updateSingleObject'],
+				inputType: ['fields'],
+			},
+		},
+	},
 ];
 
 /**
@@ -171,53 +166,48 @@ export const properties: INodeProperties[] = [
  * @public
  */
 export async function execute(
-    this: IExecuteFunctions,
-    i: number
+	this: IExecuteFunctions,
+	i: number,
 ): Promise<WorkflowFileResponse<Limeobject>> {
-    const limetype = this.getNodeParameter('limetype', i, undefined, {
-        extractValue: true,
-    }) as string;
-    const id = this.getNodeParameter('id', i) as string;
-    const inputType = this.getNodeParameter('inputType', i) as string;
+	const limetype = this.getNodeParameter('limetype', i, undefined, {
+		extractValue: true,
+	}) as string;
+	const id = this.getNodeParameter('id', i) as string;
+	const inputType = this.getNodeParameter('inputType', i) as string;
 
-    let body: IDataObject = {};
+	let body: IDataObject = {};
 
-    const propertiesResponse = await getProperties(this, limetype);
-    if (!propertiesResponse.success)
-        return {
-            json: propertiesResponse.data,
-        };
-    const properties = propertiesResponse.data;
+	const propertiesResponse = await getProperties(this, limetype);
+	if (!propertiesResponse.success)
+		return {
+			json: propertiesResponse.data,
+		};
+	const properties = propertiesResponse.data;
 
-    if (inputType === 'json') {
-        const jsonData = this.getNodeParameter('jsonData', i) as string;
-        body = JSON.parse(jsonData);
-    } else {
-        body = parseResourceMapperFields(this, i, 'properties');
-    }
+	if (inputType === 'json') {
+		const jsonData = this.getNodeParameter('jsonData', i) as string;
+		body = JSON.parse(jsonData);
+	} else {
+		body = parseResourceMapperFields(this, i, 'properties');
+	}
 
-    const fileProperties = getFilePropertiesNames(properties);
+	const fileProperties = getFilePropertiesNames(properties);
 
-    await setFileProperties(this, i, fileProperties, body);
+	await setFileProperties(this, i, fileProperties, body);
 
-    const updateLimeobjectResponse = await updateLimeobject(
-        this,
-        limetype,
-        id,
-        body
-    );
-    if (!updateLimeobjectResponse.success)
-        return {
-            json: updateLimeobjectResponse.data,
-        };
+	const updateLimeobjectResponse = await updateLimeobject(this, limetype, id, body);
+	if (!updateLimeobjectResponse.success)
+		return {
+			json: updateLimeobjectResponse.data,
+		};
 
-    const response = await processFileResponse<Limeobject>(
-        this,
-        fileProperties,
-        updateLimeobjectResponse.data
-    );
-    return {
-        json: response.json.data,
-        binary: response.binary,
-    };
+	const response = await processFileResponse<Limeobject>(
+		this,
+		fileProperties,
+		updateLimeobjectResponse.data,
+	);
+	return {
+		json: response.json.data,
+		binary: response.binary,
+	};
 }

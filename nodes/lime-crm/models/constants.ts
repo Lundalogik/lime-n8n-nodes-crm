@@ -60,9 +60,9 @@ export type APIResponsePrimitiveValue = string | boolean | number | null;
  * Wrapper for types of Lime CRM API values
  */
 export type APIResponseValue =
-    | APIResponsePrimitiveValue
-    | APIResponsePrimitiveValue[]
-    | Record<string, APIResponsePrimitiveValue>;
+	| APIResponsePrimitiveValue
+	| APIResponsePrimitiveValue[]
+	| Record<string, APIResponsePrimitiveValue>;
 
 // API
 /**

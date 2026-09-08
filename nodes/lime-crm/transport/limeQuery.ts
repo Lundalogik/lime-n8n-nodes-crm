@@ -19,7 +19,7 @@ const LIME_QUERY_URL = '/api/v1/query/';
  * @group Transport
  */
 export interface IncludedProperties {
-    [key: string]: IncludedProperties | APIResponsePrimitiveValue;
+	[key: string]: IncludedProperties | APIResponsePrimitiveValue;
 }
 
 /**
@@ -31,7 +31,7 @@ export interface IncludedProperties {
  * @group Transport
  */
 export interface QueryResponse {
-    objects: IncludedProperties[];
+	objects: IncludedProperties[];
 }
 
 /**
@@ -45,18 +45,18 @@ export interface QueryResponse {
  * @group Transport
  */
 export async function queryLimeobjects(
-    nodeContext: IAllExecuteFunctions,
-    q: string
+	nodeContext: IAllExecuteFunctions,
+	q: string,
 ): Promise<APIResponse<QueryResponse>> {
-    const queryParameters = {
-        q: q,
-    };
+	const queryParameters = {
+		q: q,
+	};
 
-    return await callLimeApi(nodeContext, {
-        method: 'GET',
-        url: LIME_QUERY_URL,
-        requestOptions: {
-            qs: queryParameters,
-        },
-    });
+	return await callLimeApi(nodeContext, {
+		method: 'GET',
+		url: LIME_QUERY_URL,
+		requestOptions: {
+			qs: queryParameters,
+		},
+	});
 }

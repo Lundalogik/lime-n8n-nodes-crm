@@ -1,9 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import {
-    IExecuteFunctions,
-    LoggerProxy as Logger,
-    NodeApiError,
-} from 'n8n-workflow';
+import { IExecuteFunctions, LoggerProxy as Logger, NodeApiError } from 'n8n-workflow';
 import { callLimeApi } from './commons';
 
 /**
@@ -42,29 +38,29 @@ const BULK_IMPORT_URL = '/limepkg-mbeku-bulk-import/bulk-imports/';
  * @group Transport
  */
 export interface BulkImportJobResponse {
-    id: string;
-    createdBy: number;
-    fileId: number | null;
-    status: 'waiting_for_data' | 'ready' | 'failed' | 'succeeded';
-    startedAt: string | null;
-    endedAt: string | null;
-    metadata: {
-        limetype: string;
-        properties: string[];
-        mode: BulkImportMode;
-        matchingProperty: string;
-    };
-    result: null | {
-        total: number;
-        created: number;
-        updated: number;
-        skipped: number;
-        failed: number;
-    };
-    extras: null | {
-        task_id?: string;
-        taskId?: string;
-    };
+	id: string;
+	createdBy: number;
+	fileId: number | null;
+	status: 'waiting_for_data' | 'ready' | 'failed' | 'succeeded';
+	startedAt: string | null;
+	endedAt: string | null;
+	metadata: {
+		limetype: string;
+		properties: string[];
+		mode: BulkImportMode;
+		matchingProperty: string;
+	};
+	result: null | {
+		total: number;
+		created: number;
+		updated: number;
+		skipped: number;
+		failed: number;
+	};
+	extras: null | {
+		task_id?: string;
+		taskId?: string;
+	};
 }
 
 /**
@@ -87,10 +83,10 @@ export type BulkImportMode = 'create' | 'update' | 'create_or_update';
  * @group Transport
  */
 export interface BulkImportJobPayload {
-    limetype: string;
-    properties: string[];
-    mode: BulkImportMode;
-    matchingProperty?: string;
+	limetype: string;
+	properties: string[];
+	mode: BulkImportMode;
+	matchingProperty?: string;
 }
 
 /**
@@ -103,8 +99,8 @@ export interface BulkImportJobPayload {
  * @group Transport
  */
 export interface BulkImportPayloadObject {
-    values: Record<string, unknown>;
-    extras?: Record<string, unknown>;
+	values: Record<string, unknown>;
+	extras?: Record<string, unknown>;
 }
 
 /**
@@ -119,37 +115,37 @@ export interface BulkImportPayloadObject {
  * @group Transport
  */
 export async function createBulkImportJob(
-    context: IExecuteFunctions,
-    payload: BulkImportJobPayload
+	context: IExecuteFunctions,
+	payload: BulkImportJobPayload,
 ): Promise<BulkImportJobResponse> {
-    Logger.info(
-        `Creating bulk import job at ${BULK_IMPORT_URL} with payload: ${JSON.stringify(payload)}`
-    );
-    try {
-        const response = await callLimeApi<BulkImportJobResponse>(context, {
-            method: 'POST',
-            url: BULK_IMPORT_URL,
-            requestOptions: {
-                body: payload,
-            },
-        });
-        if (!response.success) {
-            throw new NodeApiError(context.getNode(), {
-                message: 'The bulk import job was rejected by the server.',
-                description: `${JSON.stringify(response.data)}`,
-            });
-        }
-        Logger.info(
-            `Created bulk import job at ${BULK_IMPORT_URL} with payload: ${JSON.stringify(payload)}`
-        );
+	Logger.info(
+		`Creating bulk import job at ${BULK_IMPORT_URL} with payload: ${JSON.stringify(payload)}`,
+	);
+	try {
+		const response = await callLimeApi<BulkImportJobResponse>(context, {
+			method: 'POST',
+			url: BULK_IMPORT_URL,
+			requestOptions: {
+				body: payload,
+			},
+		});
+		if (!response.success) {
+			throw new NodeApiError(context.getNode(), {
+				message: 'The bulk import job was rejected by the server.',
+				description: `${JSON.stringify(response.data)}`,
+			});
+		}
+		Logger.info(
+			`Created bulk import job at ${BULK_IMPORT_URL} with payload: ${JSON.stringify(payload)}`,
+		);
 
-        return response.data;
-    } catch (error) {
-        Logger.error(
-            `Failed to create bulk import job at ${BULK_IMPORT_URL} with payload: ${JSON.stringify(payload)}`
-        );
-        throw error;
-    }
+		return response.data;
+	} catch (error) {
+		Logger.error(
+			`Failed to create bulk import job at ${BULK_IMPORT_URL} with payload: ${JSON.stringify(payload)}`,
+		);
+		throw error;
+	}
 }
 
 /**
@@ -169,16 +165,16 @@ export async function createBulkImportJob(
  * @group Transport
  */
 function buildMultipartFileBody(jsonData: string, boundary: string): Buffer {
-    return Buffer.concat([
-        Buffer.from(
-            `--${boundary}\r\n` +
-                'Content-Disposition: form-data; name="file"; filename="import-data.json"\r\n' +
-                'Content-Type: application/json\r\n\r\n',
-            'utf8'
-        ),
-        Buffer.from(jsonData, 'utf8'),
-        Buffer.from(`\r\n--${boundary}--\r\n`, 'utf8'),
-    ]);
+	return Buffer.concat([
+		Buffer.from(
+			`--${boundary}\r\n` +
+				'Content-Disposition: form-data; name="file"; filename="import-data.json"\r\n' +
+				'Content-Type: application/json\r\n\r\n',
+			'utf8',
+		),
+		Buffer.from(jsonData, 'utf8'),
+		Buffer.from(`\r\n--${boundary}--\r\n`, 'utf8'),
+	]);
 }
 
 /**
@@ -194,37 +190,37 @@ function buildMultipartFileBody(jsonData: string, boundary: string): Buffer {
  * @group Transport
  */
 export async function uploadBulkImportData(
-    context: IExecuteFunctions,
-    jobId: string,
-    data: unknown
+	context: IExecuteFunctions,
+	jobId: string,
+	data: unknown,
 ): Promise<void> {
-    const url = `${BULK_IMPORT_URL}${jobId}`;
+	const url = `${BULK_IMPORT_URL}${jobId}`;
 
-    const message = `Uploading data to: ${url} for job ID: ${jobId}`;
-    Logger.info(message);
+	const message = `Uploading data to: ${url} for job ID: ${jobId}`;
+	Logger.info(message);
 
-    const jsonData = JSON.stringify(data);
-    const boundary = `----LimeCrmBulkImport${randomUUID()}`;
+	const jsonData = JSON.stringify(data);
+	const boundary = `----LimeCrmBulkImport${randomUUID()}`;
 
-    const response = await callLimeApi(context, {
-        method: 'POST',
-        url: url,
-        json: false,
-        requestOptions: {
-            body: buildMultipartFileBody(jsonData, boundary),
-            headers: {
-                'content-type': `multipart/form-data; boundary=${boundary}`,
-            },
-        },
-    });
-    if (!response.success) {
-        throw new NodeApiError(context.getNode(), {
-            message: 'The bulk import data upload was rejected by the server.',
-            description: `${JSON.stringify(response)}`,
-        });
-    }
+	const response = await callLimeApi(context, {
+		method: 'POST',
+		url: url,
+		json: false,
+		requestOptions: {
+			body: buildMultipartFileBody(jsonData, boundary),
+			headers: {
+				'content-type': `multipart/form-data; boundary=${boundary}`,
+			},
+		},
+	});
+	if (!response.success) {
+		throw new NodeApiError(context.getNode(), {
+			message: 'The bulk import data upload was rejected by the server.',
+			description: `${JSON.stringify(response)}`,
+		});
+	}
 
-    Logger.info(`Successfully uploaded data for job ID: ${jobId}`);
+	Logger.info(`Successfully uploaded data for job ID: ${jobId}`);
 }
 
 /**
@@ -239,23 +235,23 @@ export async function uploadBulkImportData(
  * @group Transport
  */
 export async function getBulkImportJobStatus(
-    context: IExecuteFunctions,
-    jobId: string
+	context: IExecuteFunctions,
+	jobId: string,
 ): Promise<BulkImportJobResponse> {
-    Logger.info(`Fetching status for bulk import job ID: ${jobId}`);
-    const response = await callLimeApi<BulkImportJobResponse>(context, {
-        method: 'GET',
-        url: `${BULK_IMPORT_URL}${jobId}`,
-    });
+	Logger.info(`Fetching status for bulk import job ID: ${jobId}`);
+	const response = await callLimeApi<BulkImportJobResponse>(context, {
+		method: 'GET',
+		url: `${BULK_IMPORT_URL}${jobId}`,
+	});
 
-    if (!response.success) {
-        throw new NodeApiError(context.getNode(), {
-            message: 'The bulk import job status could not be retrieved.',
-            description: `${JSON.stringify(response)}`,
-        });
-    }
+	if (!response.success) {
+		throw new NodeApiError(context.getNode(), {
+			message: 'The bulk import job status could not be retrieved.',
+			description: `${JSON.stringify(response)}`,
+		});
+	}
 
-    return response.data;
+	return response.data;
 }
 
 /**
@@ -271,21 +267,21 @@ export async function getBulkImportJobStatus(
  * @group Transport
  */
 export async function waitForBulkImportJob(
-    context: IExecuteFunctions,
-    jobId: string,
-    pollIntervalMs: number = 2500
+	context: IExecuteFunctions,
+	jobId: string,
+	pollIntervalMs: number = 2500,
 ): Promise<BulkImportJobResponse> {
-    let status = 'running';
-    let response: BulkImportJobResponse;
+	let status = 'running';
+	let response: BulkImportJobResponse;
 
-    while (['waiting_for_data', 'ready', 'running'].includes(status)) {
-        // Wait before polling
-        await new Promise((resolve) => setTimeout(resolve, pollIntervalMs));
+	while (['waiting_for_data', 'ready', 'running'].includes(status)) {
+		// Wait before polling
+		await new Promise((resolve) => setTimeout(resolve, pollIntervalMs));
 
-        Logger.info(`Polling bulk import job ID: ${jobId}`);
-        response = await getBulkImportJobStatus(context, jobId);
-        status = response.status;
-    }
+		Logger.info(`Polling bulk import job ID: ${jobId}`);
+		response = await getBulkImportJobStatus(context, jobId);
+		status = response.status;
+	}
 
-    return response!;
+	return response!;
 }

@@ -19,8 +19,8 @@ const LIMEOBJECT_URL = '/api/v1/limeobject/';
  * @group Transport
  */
 export interface LimeobjectCrmApiResponse {
-    id_: number;
-    _links: object;
+	id_: number;
+	_links: object;
 }
 
 /**
@@ -32,9 +32,9 @@ export interface LimeobjectCrmApiResponse {
  * @group Transport
  */
 export interface FetchManyLimeobjectsApiResponse {
-    _embedded: {
-        limeobjects: LimeobjectCrmApiResponse[];
-    };
+	_embedded: {
+		limeobjects: LimeobjectCrmApiResponse[];
+	};
 }
 
 /**
@@ -48,26 +48,26 @@ export interface FetchManyLimeobjectsApiResponse {
  * @group Transport
  */
 export async function createLimeobject(
-    nodeContext: IAllExecuteFunctions,
-    limetype: string,
-    data: object
+	nodeContext: IAllExecuteFunctions,
+	limetype: string,
+	data: object,
 ): Promise<APIResponse<Limeobject>> {
-    const url = `${LIMEOBJECT_URL}${limetype}/`;
-    const response = await callLimeApi<LimeobjectCrmApiResponse>(nodeContext, {
-        method: 'POST',
-        url: url,
-        requestOptions: {
-            body: data,
-        },
-        errorMetadata: {
-            limetype: limetype,
-        },
-    });
-    if (response.success) {
-        return prepareResponseWithoutKeys(response, ['_links']);
-    } else {
-        return response;
-    }
+	const url = `${LIMEOBJECT_URL}${limetype}/`;
+	const response = await callLimeApi<LimeobjectCrmApiResponse>(nodeContext, {
+		method: 'POST',
+		url: url,
+		requestOptions: {
+			body: data,
+		},
+		errorMetadata: {
+			limetype: limetype,
+		},
+	});
+	if (response.success) {
+		return prepareResponseWithoutKeys(response, ['_links']);
+	} else {
+		return response;
+	}
 }
 
 /**
@@ -82,19 +82,19 @@ export async function createLimeobject(
  * @group Transport
  */
 export async function deleteLimeobject(
-    nodeContext: IAllExecuteFunctions,
-    limetype: string,
-    id: string
+	nodeContext: IAllExecuteFunctions,
+	limetype: string,
+	id: string,
 ): Promise<APIResponse<Record<string, never>>> {
-    const url = `${LIMEOBJECT_URL}${limetype}/${id}/`;
-    return await callLimeApi<Record<string, never>>(nodeContext, {
-        method: 'DELETE',
-        url: url,
-        errorMetadata: {
-            limetype: limetype,
-            id: id,
-        },
-    });
+	const url = `${LIMEOBJECT_URL}${limetype}/${id}/`;
+	return await callLimeApi<Record<string, never>>(nodeContext, {
+		method: 'DELETE',
+		url: url,
+		errorMetadata: {
+			limetype: limetype,
+			id: id,
+		},
+	});
 }
 
 /**
@@ -109,24 +109,24 @@ export async function deleteLimeobject(
  * @group Transport
  */
 export async function getLimeobject(
-    nodeContext: IAllExecuteFunctions,
-    limetype: string,
-    id: string
+	nodeContext: IAllExecuteFunctions,
+	limetype: string,
+	id: string,
 ): Promise<APIResponse<Limeobject>> {
-    const url = `${LIMEOBJECT_URL}${limetype}/${id}/`;
-    const response = await callLimeApi<LimeobjectCrmApiResponse>(nodeContext, {
-        method: 'GET',
-        url: url,
-        errorMetadata: {
-            limetype: limetype,
-            id: id,
-        },
-    });
-    if (response.success) {
-        return prepareResponseWithoutKeys(response, ['_links']);
-    } else {
-        return response;
-    }
+	const url = `${LIMEOBJECT_URL}${limetype}/${id}/`;
+	const response = await callLimeApi<LimeobjectCrmApiResponse>(nodeContext, {
+		method: 'GET',
+		url: url,
+		errorMetadata: {
+			limetype: limetype,
+			id: id,
+		},
+	});
+	if (response.success) {
+		return prepareResponseWithoutKeys(response, ['_links']);
+	} else {
+		return response;
+	}
 }
 
 /**
@@ -142,26 +142,26 @@ export async function getLimeobject(
  * @group Transport
  */
 export async function updateLimeobject(
-    nodeContext: IAllExecuteFunctions,
-    limetype: string,
-    id: string,
-    data: object
+	nodeContext: IAllExecuteFunctions,
+	limetype: string,
+	id: string,
+	data: object,
 ): Promise<APIResponse<Limeobject>> {
-    const url = `${LIMEOBJECT_URL}${limetype}/${id}/`;
-    const response = await callLimeApi<LimeobjectCrmApiResponse>(nodeContext, {
-        method: 'PUT',
-        url: url,
-        requestOptions: {
-            body: data,
-        },
-        errorMetadata: {
-            limetype: limetype,
-            id: id,
-        },
-    });
-    if (response.success) {
-        return prepareResponseWithoutKeys(response, ['_links']);
-    } else {
-        return response;
-    }
+	const url = `${LIMEOBJECT_URL}${limetype}/${id}/`;
+	const response = await callLimeApi<LimeobjectCrmApiResponse>(nodeContext, {
+		method: 'PUT',
+		url: url,
+		requestOptions: {
+			body: data,
+		},
+		errorMetadata: {
+			limetype: limetype,
+			id: id,
+		},
+	});
+	if (response.success) {
+		return prepareResponseWithoutKeys(response, ['_links']);
+	} else {
+		return response;
+	}
 }

@@ -7,9 +7,9 @@ import { APIResponseValue } from './constants';
  * @property inactive - flag describing whether the property is used or not
  */
 type LimetypePropertyOption = {
-    key: string;
-    text: string;
-    inactive: boolean;
+	key: string;
+	text: string;
+	inactive: boolean;
 };
 
 /**
@@ -26,13 +26,13 @@ type LimetypePropertyOption = {
  * @group Models
  */
 export type LimetypeProperty = {
-    name: string;
-    localname: string;
-    type: string;
-    required: boolean;
-    length?: number;
-    options?: LimetypePropertyOption[];
-    relatedLimetype?: string;
+	name: string;
+	localname: string;
+	type: string;
+	required: boolean;
+	length?: number;
+	options?: LimetypePropertyOption[];
+	relatedLimetype?: string;
 } & Record<string, APIResponseValue>;
 
 /**
@@ -45,8 +45,8 @@ export type LimetypeProperty = {
  * @group Models
  */
 export type LimetypeLocalName = {
-    singular: string;
-    plural: string;
+	singular: string;
+	plural: string;
 };
 
 /**
@@ -60,7 +60,7 @@ export type LimetypeLocalName = {
  * @group Models
  */
 export type Limetype = {
-    name: string;
-    localname: LimetypeLocalName;
-    properties: LimetypeProperty[];
+	name: string;
+	localname: LimetypeLocalName;
+	properties: LimetypeProperty[];
 } & Record<string, APIResponseValue>;
