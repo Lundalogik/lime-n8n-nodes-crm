@@ -8,6 +8,7 @@ import {
 	NodePropertyTypes,
 } from 'n8n-workflow';
 
+import { toNodeError } from '../errorHandling';
 import { metadataFields, metadataOperations } from './resources/metadata';
 import { adminFields, adminOperations } from './resources/admin';
 import { dataFields, dataOperations } from './resources/data';
@@ -210,7 +211,7 @@ export class LimeCrm implements INodeType {
 					returnData.push({ json: {}, error: error.message });
 					continue;
 				}
-				throw error;
+				throw toNodeError(this.getNode(), error);
 			}
 		}
 
