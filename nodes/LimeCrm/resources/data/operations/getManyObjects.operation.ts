@@ -210,16 +210,15 @@ export const properties: INodeProperties[] = [
 			},
 		},
 	},
+	/* eslint-disable n8n-nodes-base/node-param-default-wrong-for-limit, n8n-nodes-base/node-param-type-options-missing-from-limit, n8n-nodes-base/node-param-description-missing-from-limit */
 	{
 		displayName: 'Limit',
 		name: 'limit',
 		type: 'number',
-		typeOptions: {
-			minValue: 1,
-		},
-		default: 50,
-		description: 'Max number of results to return',
-		hint: 'Leave the input empty to return all objects',
+		default: DEFAULT_API_OBJECT_LIMIT,
+		description:
+			'The maximum number of objects to return. Leaving an empty input or specifying "0" will return ' +
+			'all objects.',
 		displayOptions: {
 			show: {
 				resource: [DATA_RESOURCE],
@@ -227,6 +226,7 @@ export const properties: INodeProperties[] = [
 			},
 		},
 	},
+	/* eslint-enable n8n-nodes-base/node-param-default-wrong-for-limit, n8n-nodes-base/node-param-type-options-missing-from-limit, n8n-nodes-base/node-param-description-missing-from-limit */
 	{
 		displayName: 'Offset',
 		name: 'offset',
