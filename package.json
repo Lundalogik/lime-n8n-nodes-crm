@@ -43,7 +43,7 @@
 		],
 		"nodes": [
 			"dist/nodes/LimeCrm/LimeCrm.node.js",
-			"dist/nodes/LimeCrmTrigger/LimeCrmTrigger.node.js"
+			"dist/nodes/LimeCrm/LimeCrmTrigger.node.js"
 		]
 	},
 	"devDependencies": {
