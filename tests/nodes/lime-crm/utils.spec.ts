@@ -24,7 +24,9 @@ import {
 	getFilenameFromHeader,
 	getFilePropertiesNames,
 	getWebhook,
+	LimetypeProperty,
 	processFileResponse,
+	replaceNullTextValues,
 	setFilename,
 	setFileProperties,
 	WebhookFunctions,
@@ -233,5 +235,72 @@ describe('webhook', () => {
 				name: 'company-new-1762948800000',
 			});
 		});
+	});
+});
+
+describe('replaceNullTextValues', () => {
+	const properties = [
+		{ name: 'name', type: 'string' },
+		{ name: 'notes', type: 'text' },
+		{ name: 'phone', type: 'phone' },
+		{ name: 'website', type: 'link' },
+		{ name: 'age', type: 'integer' },
+		{ name: 'birthday', type: 'date' },
+		{ name: 'category', type: 'option' },
+		{ name: 'active', type: 'yesno' },
+		{ name: 'company', type: 'belongsto' },
+	] as LimetypeProperty[];
+
+	it('replaces null with an empty string for every text-like type', () => {
+		const result = replaceNullTextValues(
+			{ name: null, notes: null, phone: null, website: null },
+			properties,
+		);
+
+		expect(result).toEqual({
+			name: '',
+			notes: '',
+			phone: '',
+			website: '',
+		});
+	});
+
+	it('leaves null untouched for non-text types', () => {
+		const data = {
+			age: null,
+			birthday: null,
+			category: null,
+			active: null,
+			company: null,
+		};
+
+		expect(replaceNullTextValues(data, properties)).toEqual(data);
+	});
+
+	it('keeps non-null text values and unknown properties as they are', () => {
+		const data = { name: 'Jane', notes: '', unknown: null, age: 42 };
+
+		expect(replaceNullTextValues(data, properties)).toEqual(data);
+	});
+
+	it('does not add properties that are missing from the input', () => {
+		const result = replaceNullTextValues({ name: null }, properties);
+
+		expect(result).toEqual({ name: '' });
+		expect('notes' in result).toBe(false);
+	});
+
+	it('does not treat undefined as null', () => {
+		const result = replaceNullTextValues({ name: undefined }, properties);
+
+		expect(result).toEqual({ name: undefined });
+	});
+
+	it('does not mutate the input object', () => {
+		const data = { name: null };
+
+		replaceNullTextValues(data, properties);
+
+		expect(data).toEqual({ name: null });
 	});
 });
