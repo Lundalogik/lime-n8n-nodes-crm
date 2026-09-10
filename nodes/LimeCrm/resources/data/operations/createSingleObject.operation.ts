@@ -139,7 +139,7 @@ export const properties: INodeProperties[] = [
 		type: 'boolean',
 		default: true,
 		description:
-			'Accept that text fields in Lime CRM can be cleared also with null, and not only an empty string',
+			'Whether text fields in Lime CRM may also be cleared with null, not only with an empty string',
 		displayOptions: {
 			show: {
 				resource: [DATA_RESOURCE],
