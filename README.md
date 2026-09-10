@@ -27,7 +27,7 @@ Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes
 
 ### Lime CRM Trigger
 
-Starts a workflow when an object of a chosen limetype is created, updated or deleted. The trigger registers a webhook subscription in Lime CRM, verifies the HMAC signature of every delivery and stores the webhook secret encrypted at rest.
+Starts a workflow when an object of a chosen limetype is created, updated or deleted. The trigger registers a webhook subscription in Lime CRM, verifies the HMAC signature of every delivery with the webhook secret configured in the credential.
 
 ## Credentials
 
@@ -40,7 +40,7 @@ Create a **Lime CRM API** credential with:
 
 Requests are authenticated with the `X-API-Key` header, which n8n adds automatically. The credential is verified against the `/api/v1/` endpoint of your instance when you save it.
 
-To use the trigger, the n8n instance must have `N8N_ENCRYPTION_KEY` set (n8n sets this by default); it is used to encrypt the webhook secret at rest.
+To use the trigger, also set the optional **Webhook Secret** in the credential; Lime CRM signs deliveries with it. Use a strong value, e.g. generated with `openssl rand -hex 32`.
 
 ## Compatibility
 
