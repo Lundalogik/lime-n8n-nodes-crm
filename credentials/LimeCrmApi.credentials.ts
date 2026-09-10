@@ -1,10 +1,4 @@
-import {
-	ICredentialType,
-	INodeProperties,
-	IHttpRequestMethods,
-	IAuthenticate,
-	ICredentialTestRequest,
-} from 'n8n-workflow';
+import { ICredentialType, INodeProperties, IAuthenticate } from 'n8n-workflow';
 
 import { LIME_CRM_API_CREDENTIAL_KEY } from '../nodes';
 
@@ -30,9 +24,9 @@ import { LIME_CRM_API_CREDENTIAL_KEY } from '../nodes';
  *   - You can obtain it from Lime Admin.
  *
  * ## Testing Connection
- * The `test` property verifies credentials by sending a `GET` request to the `/api/v1/` endpoint
- * of the provided Lime CRM instance. If the response is successful (HTTP 200), the credentials
- * are valid.
+ * The credential is tested by the `limeCrmApiTest` function (see `nodes/credentialTests.ts`),
+ * which validates the optional webhook secret locally and verifies the URL and API key
+ * by sending a `GET` request to the `/api/v1/` endpoint of the provided Lime CRM instance.
  *
  * ## Related Documentation
  * - Lime CRM API Docs: https://lime-crm.com/api-docs/
@@ -66,6 +60,22 @@ export class LimeCrmApi implements ICredentialType {
 			required: true,
 			description: 'The API key obtained from Lime CRM',
 		},
+		{
+			displayName: 'Webhook Secret',
+			name: 'webhookSecret',
+			type: 'string',
+			typeOptions: {
+				password: true,
+			},
+			default: '',
+			description:
+				'Secret used to sign and verify webhook calls from Lime CRM. ' +
+				'Required only when using the Lime CRM Trigger node. ' +
+				'Use a strong random value of at least 32 characters, e.g. ' +
+				'generated with <code>openssl rand -hex 32</code>. Workflows ' +
+				'with a Lime CRM Trigger must be re-activated after ' +
+				'changing it.',
+		},
 	];
 
 	authenticate: IAuthenticate = {
@@ -74,18 +84,6 @@ export class LimeCrmApi implements ICredentialType {
 			headers: {
 				// Ensure the header name matches exactly what the Lime CRM API expects
 				'X-API-Key': '={{$credentials.apiKey}}',
-			},
-		},
-	};
-
-	test: ICredentialTestRequest = {
-		request: {
-			baseURL: '={{$credentials.url}}'.replace('/+$', ''),
-			url: '/api/v1/',
-			method: 'GET' as IHttpRequestMethods,
-			headers: {
-				'X-API-Key': '={{$credentials.apiKey}}',
-				Accept: 'application/json',
 			},
 		},
 	};

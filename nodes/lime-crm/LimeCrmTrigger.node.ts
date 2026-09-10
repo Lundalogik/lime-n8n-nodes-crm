@@ -19,11 +19,12 @@ import {
 	getSubscription,
 	listSubscriptionsWithExistingData,
 } from './transport';
-import { createHash, randomBytes } from 'node:crypto';
+import { createHash } from 'node:crypto';
 
-import { decryptSecret, encryptSecret } from '../crypto';
 import { getWebhook, handleWorkflowError } from './utils';
 import { verifyRequest } from '../crypto';
+import { getWebhookSecret } from '../webhookSecret';
+import { limeCrmApiTest } from '../credentialTests';
 
 /**
  * Trigger node for handling incoming webhooks from **Lime CRM**.
@@ -68,6 +69,7 @@ export class LimeCrmTrigger implements INodeType {
 			{
 				name: LIME_CRM_API_CREDENTIAL_KEY,
 				required: true,
+				testedBy: 'limeCrmApiTest',
 			},
 		],
 		webhooks: [
@@ -145,6 +147,9 @@ export class LimeCrmTrigger implements INodeType {
 		loadOptions: {
 			getLimetypes,
 		},
+		credentialTest: {
+			limeCrmApiTest,
+		},
 	};
 
 	/**
@@ -158,6 +163,16 @@ export class LimeCrmTrigger implements INodeType {
 		default: {
 			async checkExists(this: IHookFunctions): Promise<boolean> {
 				const webhook = getWebhook(this);
+
+				// Older versions stored an encrypted copy of the secret in
+				// static data. The subscription in Lime CRM still signs with
+				// that secret, which is no longer readable, so report the
+				// webhook as missing to have `create` re-register it with the
+				// secret from the credential and clean up the stale one.
+				if (webhook.data.webhookSecret) {
+					delete webhook.data.webhookSecret;
+					return false;
+				}
 
 				if (!webhook.data.webhookId) {
 					return false;
@@ -197,11 +212,9 @@ export class LimeCrmTrigger implements INodeType {
 					});
 				}
 
-				const rawSecret = randomBytes(32).toString('hex');
-				webhook.data.webhookSecret = encryptSecret(rawSecret);
 				const webhookCreateData = {
 					...webhook,
-					secret: rawSecret,
+					secret: await getWebhookSecret(this, LIME_CRM_API_CREDENTIAL_KEY),
 				};
 
 				const createSubscriptionResponse = await createSubscription(this, webhookCreateData);
@@ -277,14 +290,7 @@ export class LimeCrmTrigger implements INodeType {
 		Logger.info('Webhook received. Starting webhook processing...', {
 			...webhook.context,
 		});
-		const encryptedSecret = webhook.data.webhookSecret;
-		if (!encryptedSecret) {
-			throw new NodeOperationError(
-				this.getNode(),
-				'Webhook is not registered: missing secret in static data',
-			);
-		}
-		const webhookSecret = decryptSecret(encryptedSecret);
+		const webhookSecret = await getWebhookSecret(this, LIME_CRM_API_CREDENTIAL_KEY);
 		const requestObject = this.getRequestObject();
 		const headerData = this.getHeaderData();
 		const bodyData = this.getBodyData();
