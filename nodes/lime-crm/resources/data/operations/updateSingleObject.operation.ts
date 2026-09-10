@@ -1,7 +1,12 @@
 import { IDataObject, IExecuteFunctions, INodeProperties } from 'n8n-workflow';
 import { getProperties, updateLimeobject } from '../../../transport';
 import { DATA_RESOURCE, Limeobject } from '../../../models';
-import { getFilePropertiesNames, processFileResponse, setFileProperties } from '../../../utils';
+import {
+	getFilePropertiesNames,
+	processFileResponse,
+	replaceNullTextValues,
+	setFileProperties,
+} from '../../../utils';
 import { WorkflowFileResponse } from '../../../../response';
 import { parseResourceMapperFields } from '../../../methods';
 
@@ -25,6 +30,7 @@ export const description = {
  * @param {'simple' | 'json'} inputType - How the object data is provided: 'simple' for form inputs, 'json' for raw JSON
  * @param {IDataObject} simpleFields - Used if `inputType` is 'simple'. List of field name/value pairs to update
  * @param {string} jsonData - Used if `inputType` is 'json'. Full object data in JSON format
+ * @param {boolean} acceptNullForTexts - Whether `null` values of text properties are sent as empty strings
  *
  * @public
  */
@@ -142,6 +148,20 @@ export const properties: INodeProperties[] = [
 			},
 		},
 	},
+	{
+		displayName: 'Accept null for texts',
+		name: 'acceptNullForTexts',
+		type: 'boolean',
+		default: false,
+		description:
+			'Accept that text fields in Lime CRM can be cleared also with null, and not only an empty string',
+		displayOptions: {
+			show: {
+				resource: [DATA_RESOURCE],
+				operation: ['updateSingleObject'],
+			},
+		},
+	},
 ];
 
 /**
@@ -155,9 +175,10 @@ export const properties: INodeProperties[] = [
  *
  * The method performs the following steps:
  * 1. Retrieves the `limetype`, `id`, and input data from {@link properties}.
- * 2. Collects and prepares any file properties using {@link getFilePropertiesNames} and {@link setFileProperties}.
- * 3. Calls {@link updateLimeobject} to update the object in Lime CRM.
- * 4. Processes the response, including file properties, using {@link processFileResponse}.
+ * 2. Optionally replaces `null` values of text properties with empty strings.
+ * 3. Collects and prepares any file properties using {@link getFilePropertiesNames} and {@link setFileProperties}.
+ * 4. Calls {@link updateLimeobject} to update the object in Lime CRM.
+ * 5. Processes the response, including file properties, using {@link processFileResponse}.
  *
  * @param i - The index of the current item in the workflow execution
  *
@@ -189,6 +210,11 @@ export async function execute(
 		body = JSON.parse(jsonData);
 	} else {
 		body = parseResourceMapperFields(this, i, 'properties');
+	}
+
+	const acceptNullForTexts = this.getNodeParameter('acceptNullForTexts', i, false) as boolean;
+	if (acceptNullForTexts) {
+		body = replaceNullTextValues(body, properties);
 	}
 
 	const fileProperties = getFilePropertiesNames(properties);

@@ -708,3 +708,106 @@ describe('LimeCrmNode execute — dispatch and error handling', () => {
 		]);
 	});
 });
+
+describe('LimeCrmNode execute — accept null for texts', () => {
+	const personProperties = [
+		{ name: 'name', type: 'string' },
+		{ name: 'notes', type: 'text' },
+		{ name: 'age', type: 'integer' },
+	];
+
+	it('createSingleObject sends empty strings for null text values by default', async () => {
+		transportMock.getProperties.mockResolvedValue(ok(personProperties) as never);
+		transportMock.createLimeobject.mockResolvedValue(ok({ _id: 1 }) as never);
+		const ctx = makeNodeExecuteContext({
+			resource: 'data',
+			operation: 'createSingleObject',
+			limetype: 'person',
+			inputMethod: 'json',
+			objectJson: '{"name":null,"notes":null,"age":null}',
+		});
+
+		await node.execute.call(ctx);
+
+		expect(transportMock.createLimeobject).toHaveBeenCalledWith(ctx, 'person', {
+			name: '',
+			notes: '',
+			age: null,
+		});
+	});
+
+	it('createSingleObject applies the toggle to resource mapper input as well', async () => {
+		transportMock.getProperties.mockResolvedValue(ok(personProperties) as never);
+		transportMock.createLimeobject.mockResolvedValue(ok({ _id: 1 }) as never);
+		const ctx = makeNodeExecuteContext({
+			resource: 'data',
+			operation: 'createSingleObject',
+			limetype: 'person',
+			inputMethod: 'fields',
+			properties: { value: { name: null, age: 30 }, schema: [] },
+			acceptNullForTexts: true,
+		});
+
+		await node.execute.call(ctx);
+
+		expect(transportMock.createLimeobject).toHaveBeenCalledWith(ctx, 'person', {
+			name: '',
+			age: 30,
+		});
+	});
+
+	it('createSingleObject passes null through when the toggle is off', async () => {
+		transportMock.getProperties.mockResolvedValue(ok(personProperties) as never);
+		transportMock.createLimeobject.mockResolvedValue(ok({ _id: 1 }) as never);
+		const ctx = makeNodeExecuteContext({
+			resource: 'data',
+			operation: 'createSingleObject',
+			limetype: 'person',
+			inputMethod: 'json',
+			objectJson: '{"name":null}',
+			acceptNullForTexts: false,
+		});
+
+		await node.execute.call(ctx);
+
+		expect(transportMock.createLimeobject).toHaveBeenCalledWith(ctx, 'person', { name: null });
+	});
+
+	it('updateSingleObject passes null through by default', async () => {
+		transportMock.getProperties.mockResolvedValue(ok(personProperties) as never);
+		transportMock.updateLimeobject.mockResolvedValue(ok({ _id: '5' }) as never);
+		const ctx = makeNodeExecuteContext({
+			resource: 'data',
+			operation: 'updateSingleObject',
+			limetype: 'person',
+			id: '5',
+			inputType: 'json',
+			jsonData: '{"name":null}',
+		});
+
+		await node.execute.call(ctx);
+
+		expect(transportMock.updateLimeobject).toHaveBeenCalledWith(ctx, 'person', '5', { name: null });
+	});
+
+	it('updateSingleObject sends empty strings for null text values when enabled', async () => {
+		transportMock.getProperties.mockResolvedValue(ok(personProperties) as never);
+		transportMock.updateLimeobject.mockResolvedValue(ok({ _id: '5' }) as never);
+		const ctx = makeNodeExecuteContext({
+			resource: 'data',
+			operation: 'updateSingleObject',
+			limetype: 'person',
+			id: '5',
+			inputType: 'json',
+			jsonData: '{"name":null,"age":null}',
+			acceptNullForTexts: true,
+		});
+
+		await node.execute.call(ctx);
+
+		expect(transportMock.updateLimeobject).toHaveBeenCalledWith(ctx, 'person', '5', {
+			name: '',
+			age: null,
+		});
+	});
+});

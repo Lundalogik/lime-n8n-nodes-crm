@@ -2,7 +2,12 @@ import { IDataObject, IExecuteFunctions, INodeProperties } from 'n8n-workflow';
 
 import { createLimeobject, getProperties } from '../../../transport';
 import { DATA_RESOURCE } from '../../../models';
-import { getFilePropertiesNames, processFileResponse, setFileProperties } from '../../../utils';
+import {
+	getFilePropertiesNames,
+	processFileResponse,
+	replaceNullTextValues,
+	setFileProperties,
+} from '../../../utils';
 
 import { parseResourceMapperFields } from '../../../methods';
 
@@ -25,6 +30,7 @@ export const description = {
  * @param {'fields' | 'json'} inputMethod - How the user provides object data: 'fields' for form inputs, 'json' for raw JSON
  * @param {Array<{ name: string; value: string }>} properties - Used if inputMethod is 'fields'. List of property name/value pairs to set on the object
  * @param {string} objectJson - Used if inputMethod is 'json'. The full object data in JSON format
+ * @param {boolean} acceptNullForTexts - Whether `null` values of text properties are sent as empty strings
  *
  * @public
  */
@@ -127,6 +133,20 @@ export const properties: INodeProperties[] = [
 			alwaysOpenEditWindow: true,
 		},
 	},
+	{
+		displayName: 'Accept null for texts',
+		name: 'acceptNullForTexts',
+		type: 'boolean',
+		default: true,
+		description:
+			'Accept that text fields in Lime CRM can be cleared also with null, and not only an empty string',
+		displayOptions: {
+			show: {
+				resource: [DATA_RESOURCE],
+				operation: ['createSingleObject'],
+			},
+		},
+	},
 ];
 
 /**
@@ -141,9 +161,10 @@ export const properties: INodeProperties[] = [
  * The method performs the following steps:
  * 1. Reads the limetype and input method from node parameters.
  * 2. Parses input data according to the selected input method.
- * 3. Resolves any file properties present in the object and sets the file properties on the object.
- * 4. Sends a request to the Lime API to create the object.
- * 5. Processes any returned file data and formats the response.
+ * 3. Optionally replaces `null` values of text properties with empty strings.
+ * 4. Resolves any file properties present in the object and sets the file properties on the object.
+ * 5. Sends a request to the Lime API to create the object.
+ * 6. Processes any returned file data and formats the response.
  *
  * @returns The newly created Lime object.
  *
@@ -167,6 +188,11 @@ export async function execute(this: IExecuteFunctions, i: number) {
 		objectData = JSON.parse(jsonInput);
 	} else {
 		objectData = parseResourceMapperFields(this, i, 'properties');
+	}
+
+	const acceptNullForTexts = this.getNodeParameter('acceptNullForTexts', i, true) as boolean;
+	if (acceptNullForTexts) {
+		objectData = replaceNullTextValues(objectData, properties);
 	}
 
 	const fileProperties = getFilePropertiesNames(properties, new Set(Object.keys(objectData)));
