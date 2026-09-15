@@ -27,10 +27,7 @@ describe.each([['limeCrmApiTest', limeCrmApiTest, '/api/v1/']])(
 
 			expect(result).toEqual({
 				status: 'Error',
-				message:
-					'The Webhook Secret is shorter than the recommended 32 ' +
-					'characters. Consider a stronger value, e.g. generated ' +
-					'with "openssl rand -hex 32"',
+				message: 'The Webhook Secret is shorter than the recommended 32 characters',
 			});
 			expect(request).not.toHaveBeenCalled();
 		});
