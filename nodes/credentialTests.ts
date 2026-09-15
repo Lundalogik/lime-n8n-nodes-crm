@@ -56,8 +56,7 @@ const validateWebhookSecret = (
 			status: 'Error',
 			message:
 				`The Webhook Secret is shorter than the recommended ` +
-				`${MIN_WEBHOOK_SECRET_LENGTH} characters. Consider a ` +
-				`stronger value, e.g. generated with "openssl rand -hex 32"`,
+				`${MIN_WEBHOOK_SECRET_LENGTH} characters`,
 		};
 	}
 	return null;
