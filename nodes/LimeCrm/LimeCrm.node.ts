@@ -8,7 +8,6 @@ import {
 	NodePropertyTypes,
 } from 'n8n-workflow';
 
-import { toNodeError } from '../errorHandling';
 import { metadataFields, metadataOperations } from './resources/metadata';
 import { adminFields, adminOperations } from './resources/admin';
 import { dataFields, dataOperations } from './resources/data';
@@ -31,6 +30,7 @@ import {
 	getRelationLookupMappingColumns,
 	getRelationPropertiesWithLookupField,
 } from './methods';
+import { handleWorkflowError } from '../errorHandling';
 
 /**
  * Representation of a function that executes a specific Lime CRM operation.
@@ -211,7 +211,7 @@ export class LimeCrm implements INodeType {
 					returnData.push({ json: {}, error: error.message, pairedItem: { item: i } });
 					continue;
 				}
-				throw toNodeError(this.getNode(), error);
+				throw handleWorkflowError(this.getNode(), error);
 			}
 		}
 

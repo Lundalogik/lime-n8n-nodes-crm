@@ -1,7 +1,8 @@
 import { randomUUID } from 'node:crypto';
 import { IExecuteFunctions, LoggerProxy as Logger, NodeApiError, sleep } from 'n8n-workflow';
 import { callLimeApi } from './commons';
-import { toNodeError } from '../../errorHandling';
+import { handleWorkflowError } from '../../errorHandling';
+import { APIResponse } from '../../response';
 
 /**
  * Endpoint path for Lime CRM bulk import API.
@@ -118,7 +119,7 @@ export interface BulkImportPayloadObject {
 export async function createBulkImportJob(
 	context: IExecuteFunctions,
 	payload: BulkImportJobPayload,
-): Promise<BulkImportJobResponse> {
+): Promise<APIResponse<BulkImportJobResponse>> {
 	Logger.info(
 		`Creating bulk import job at ${BULK_IMPORT_URL} with payload: ${JSON.stringify(payload)}`,
 	);
@@ -131,21 +132,28 @@ export async function createBulkImportJob(
 			},
 		});
 		if (!response.success) {
-			throw new NodeApiError(context.getNode(), {
-				message: 'The bulk import job was rejected by the server.',
-				description: `${JSON.stringify(response.data)}`,
-			});
+			return handleWorkflowError(
+				context.getNode(),
+				{
+					message: 'The bulk import job was rejected by the server.',
+					description: `${JSON.stringify(response.data)}`,
+				},
+				true,
+			);
 		}
 		Logger.info(
 			`Created bulk import job at ${BULK_IMPORT_URL} with payload: ${JSON.stringify(payload)}`,
 		);
 
-		return response.data;
+		return {
+			success: true,
+			data: response.data,
+		};
 	} catch (error) {
 		Logger.error(
 			`Failed to create bulk import job at ${BULK_IMPORT_URL} with payload: ${JSON.stringify(payload)}`,
 		);
-		throw toNodeError(context.getNode(), error);
+		return handleWorkflowError(context.getNode(), error, true);
 	}
 }
 

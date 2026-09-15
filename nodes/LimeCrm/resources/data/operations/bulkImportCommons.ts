@@ -326,7 +326,9 @@ export async function executeBulkImport(
 	};
 
 	const jobResponse = await createBulkImportJob(context, jobPayload);
-	const jobId = jobResponse.id;
+	if (!jobResponse.success) return jobResponse.data;
+
+	const jobId = jobResponse.data.id;
 
 	// Step 4: Upload the data file
 	await uploadBulkImportData(context, jobId, body);

@@ -45,7 +45,7 @@ describe('createBulkImportJob', () => {
 			url: '/limepkg-mbeku-bulk-import/bulk-imports/',
 			requestOptions: { body: payload },
 		});
-		expect(job).toEqual({ id: 'job1', status: 'ready' });
+		expect(job).toEqual(ok({ id: 'job1', status: 'ready' }));
 	});
 
 	it('throws a NodeApiError when the server rejects the job', async () => {
