@@ -12,9 +12,9 @@ describe.each([['LimeCrmApi', new LimeCrmApi()]])(
 			expect(field!.typeOptions?.password).toBe(true);
 		});
 
-		it('tells the user how to generate a strong secret', () => {
+		it('describes the expected secret length', () => {
 			expect(field!.default).toBe('');
-			expect(field!.description).toContain('openssl rand -hex 32');
+			expect(field!.description).toContain('at least 32 characters');
 		});
 	},
 );

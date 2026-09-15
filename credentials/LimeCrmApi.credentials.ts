@@ -71,10 +71,9 @@ export class LimeCrmApi implements ICredentialType {
 			description:
 				'Secret used to sign and verify webhook calls from Lime CRM. ' +
 				'Required only when using the Lime CRM Trigger node. ' +
-				'Use a strong random value of at least 32 characters, e.g. ' +
-				'generated with <code>openssl rand -hex 32</code>. Workflows ' +
-				'with a Lime CRM Trigger must be re-activated after ' +
-				'changing it.',
+				'Use a strong random value of at least 32 characters. ' +
+				'Workflows with a Lime CRM Trigger must be re-activated ' +
+				'after changing it.',
 		},
 	];
 
