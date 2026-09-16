@@ -86,7 +86,8 @@ export function getBulkImportProperties(
 			},
 		},
 		{
-			displayName: 'Matching Property Name or ID',
+			// eslint-disable-next-line n8n-nodes-base/node-param-display-name-wrong-for-dynamic-options
+			displayName: 'Matching Property',
 			name: 'matchingProperty',
 			type: 'options',
 			typeOptions: {
@@ -95,8 +96,8 @@ export function getBulkImportProperties(
 			},
 			required: matchingPropertyRequired,
 			default: '',
-			description:
-				'The property to use to match existing objects. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
+			// eslint-disable-next-line n8n-nodes-base/node-param-description-wrong-for-dynamic-options
+			description: 'The property to use to match existing objects',
 			hint: matchingPropertyRequired
 				? 'Must be a unique property'
 				: 'Optional: if set, objects matching an existing record will be skipped',
