@@ -101,7 +101,8 @@ export const properties: INodeProperties[] = [
 		placeholder: 'e.g., 12345',
 	},
 	{
-		displayName: 'File Type Property Name or ID',
+		// eslint-disable-next-line n8n-nodes-base/node-param-display-name-wrong-for-dynamic-options
+		displayName: 'File Type Property',
 		name: 'property',
 		type: 'options',
 		typeOptions: {
@@ -110,8 +111,8 @@ export const properties: INodeProperties[] = [
 		},
 		required: true,
 		default: '',
-		description:
-			'The type of entity associated with the file. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
+		// eslint-disable-next-line n8n-nodes-base/node-param-description-wrong-for-dynamic-options
+		description: 'The type of entity associated with the file',
 		displayOptions: {
 			show: {
 				resource: [METADATA_RESOURCE],

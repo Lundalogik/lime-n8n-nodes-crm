@@ -99,15 +99,16 @@ export class LimeCrmTrigger implements INodeType {
 						displayName: 'Event',
 						values: [
 							{
-								displayName: 'Limetype Name or ID',
+								// eslint-disable-next-line n8n-nodes-base/node-param-display-name-wrong-for-dynamic-options
+								displayName: 'Limetype',
 								name: 'limetype',
 								type: 'options',
 								typeOptions: {
 									loadOptionsMethod: 'getLimetypes',
 								},
 								default: '',
-								description:
-									'Limetype to subscribe to events for. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
+								// eslint-disable-next-line n8n-nodes-base/node-param-description-wrong-for-dynamic-options
+								description: 'Limetype to subscribe to events for',
 							},
 							{
 								displayName: 'Event',

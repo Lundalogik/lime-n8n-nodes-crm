@@ -162,11 +162,12 @@ export const properties: INodeProperties[] = [
 		},
 		options: [
 			{
-				displayName: 'Property',
+				displayName: 'Property Name',
 				name: 'property',
 				values: [
 					{
-						displayName: 'Property Name or ID',
+						// eslint-disable-next-line n8n-nodes-base/node-param-display-name-wrong-for-dynamic-options
+						displayName: 'Property Name',
 						name: 'name',
 						type: 'options',
 						typeOptions: {
@@ -175,8 +176,8 @@ export const properties: INodeProperties[] = [
 							loadOptionsDependsOn: ['limetype.value'],
 						},
 						default: '',
-						description:
-							'Name of the property. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
+						// eslint-disable-next-line n8n-nodes-base/node-param-description-wrong-for-dynamic-options
+						description: 'Name of the property',
 					},
 				],
 			},
@@ -291,7 +292,8 @@ export const properties: INodeProperties[] = [
 				displayName: 'Order By Fields',
 				values: [
 					{
-						displayName: 'Property Name or ID',
+						// eslint-disable-next-line n8n-nodes-base/node-param-display-name-wrong-for-dynamic-options
+						displayName: 'Property Name',
 						name: 'propertyName',
 						type: 'options',
 						required: true,
@@ -301,8 +303,8 @@ export const properties: INodeProperties[] = [
 							loadOptionsDependsOn: ['limetype.value'],
 						},
 						default: '',
-						description:
-							'Name of the property to order by. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
+						// eslint-disable-next-line n8n-nodes-base/node-param-description-wrong-for-dynamic-options
+						description: 'Name of the property to order by',
 					},
 					{
 						displayName: 'Sort Direction',
