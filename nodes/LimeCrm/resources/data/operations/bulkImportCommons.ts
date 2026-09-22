@@ -227,7 +227,7 @@ function parseJsonParam(context: IExecuteFunctions, idx: number): IDataObject {
  * @param raw - The parsed JSON entry
  */
 function toPayloadObject(context: IExecuteFunctions, raw: IDataObject): BulkImportPayloadObject {
-	return { values: raw as IDataObject };
+	return { values: raw };
 }
 
 /**
