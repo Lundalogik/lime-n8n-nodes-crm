@@ -29,7 +29,7 @@ import { LIME_CRM_API_CREDENTIAL_KEY } from '../nodes';
  * by sending a `GET` request to the `/api/v1/` endpoint of the provided Lime CRM instance.
  *
  * ## Related Documentation
- * - Lime CRM API Docs: https://lime-crm.com/api-docs/
+ * - Lime CRM API credential setup: https://platform.docs.lime-crm.com/en/latest/workflows-and-integrations/credential-setup/#lime-crm-api
  * - n8n Credentials Guide: https://docs.n8n.io/integrations/credentials/
  *
  * @public
@@ -37,7 +37,8 @@ import { LIME_CRM_API_CREDENTIAL_KEY } from '../nodes';
 export class LimeCrmApi implements ICredentialType {
 	name = LIME_CRM_API_CREDENTIAL_KEY;
 	displayName = 'Lime CRM API';
-	documentationUrl = 'https://lime-crm.com/api-docs/';
+	documentationUrl =
+		'https://platform.docs.lime-crm.com/en/latest/workflows-and-integrations/credential-setup/#lime-crm-api';
 	icon = 'file:assets/lime-crm.svg' as const;
 	properties: INodeProperties[] = [
 		{
