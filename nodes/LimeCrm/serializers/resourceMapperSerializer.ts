@@ -19,7 +19,8 @@ interface ResourceMapperFieldMap {
  * @throws {SerializerError} If the input value is not a string or does not represent a date.
  * @returns The ISO 8601 formatted string representation of the datetime.
  */
-const serializeDatetime: SerializerFn = (value) => {
+const serializeDatetime: SerializerFn = (value): string | null => {
+	if (!value) return null;
 	if (typeof value !== 'string') {
 		throw new SerializerError(`Expected string as dateTime, got ${typeof value}`);
 	}
