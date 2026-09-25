@@ -1,3 +1,11 @@
+## [1.0.1](https://github.com/Lundalogik/lime-n8n-nodes-crm/compare/v1.0.0...v1.0.1) (2026-09-25)
+
+
+### Bug Fixes
+
+* **credentials:** point documentationUrl at a page that resolves ([d8154f5](https://github.com/Lundalogik/lime-n8n-nodes-crm/commit/d8154f5d3042f5209984829d649cdd92a55674c0))
+* enhance HMAC verification with constant-time comparison and add tests for verifyRequest ([09e2c01](https://github.com/Lundalogik/lime-n8n-nodes-crm/commit/09e2c01c2f09353d543f22b04156cb266221b28f))
+
 # 1.0.0 (2026-09-24)
 
 
