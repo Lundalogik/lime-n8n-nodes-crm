@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/Lundalogik/lime-n8n-nodes-crm/compare/v1.0.1...v1.0.2) (2026-09-25)
+
+
+### Bug Fixes
+
+* fix bulk import serialization error ([0c75c3f](https://github.com/Lundalogik/lime-n8n-nodes-crm/commit/0c75c3fa3c13efed88dd6b647a125a36b7cce691))
+
 ## [1.0.1](https://github.com/Lundalogik/lime-n8n-nodes-crm/compare/v1.0.0...v1.0.1) (2026-09-25)
 
 
