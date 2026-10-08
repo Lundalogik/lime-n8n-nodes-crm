@@ -44,6 +44,10 @@ Requests are authenticated with the `X-API-Key` header, which n8n adds automatic
 
 To use the trigger, also set the optional **Webhook Secret** in the credential; Lime CRM signs deliveries with it. Use a strong value, e.g. generated with `openssl rand -hex 32`.
 
+The trigger registers the subscription through `/api/v2/subscription/`, so a Lime CRM that supports it signs every delivery over the delivery id, a timestamp and the body. Such a delivery is rejected when it is older than five minutes or has already been processed. An older Lime CRM answers 404 and the trigger falls back to version 1, which signs the body only.
+
+To change the secret without breaking active workflows, move the current value to **Previous Webhook Secret**, set the new **Webhook Secret**, re-activate the workflows with a trigger, then clear the previous secret. Deliveries signed with either secret are accepted while both are set.
+
 ## Compatibility
 
 Requires n8n with `n8n-workflow` 2.9 or later. Node.js 24 is used for local development.
