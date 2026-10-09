@@ -22,8 +22,8 @@ import {
 import { createHash } from 'node:crypto';
 
 import { getWebhook, handleWorkflowError } from './utils';
-import { verifyRequest } from '../crypto';
-import { getWebhookSecret } from '../webhookSecret';
+import { SIGNATURE_VERSION_V1, deliveryReplayCache, verifyDelivery } from '../crypto';
+import { getWebhookSecret, getWebhookSecrets } from '../webhookSecret';
 import { limeCrmApiTest } from '../credentialTests';
 
 /**
@@ -184,7 +184,16 @@ export class LimeCrmTrigger implements INodeType {
 				}
 
 				try {
-					await getSubscription(this, webhook.data.webhookId);
+					const response = await getSubscription(
+						this,
+						webhook.data.webhookId,
+						webhook.data.signatureVersion ?? SIGNATURE_VERSION_V1,
+					);
+					if (response.success) {
+						// A subscription registered before version 2 existed has
+						// no version in static data. The server knows how it signs.
+						webhook.data.signatureVersion = response.data.signature_version ?? SIGNATURE_VERSION_V1;
+					}
 				} catch (error) {
 					if (error.cause?.status === 404) {
 						delete webhook.data.webhookId;
@@ -234,17 +243,23 @@ export class LimeCrmTrigger implements INodeType {
 				if (existingSubscriptionResponse.data.length > 0) {
 					for (const subscription of existingSubscriptionResponse.data) {
 						Logger.info('Deleting existing Lime CRM webhook with ID: ' + subscription.id);
-						await deleteSubscription(this, subscription.id);
+						await deleteSubscription(
+							this,
+							subscription.id,
+							subscription.signature_version ?? SIGNATURE_VERSION_V1,
+						);
 					}
 				}
 
 				const subscriptionId = createSubscriptionResponse.data.id;
 				const events = createSubscriptionResponse.data.events;
+				const signatureVersion = createSubscriptionResponse.data.signatureVersion;
 
 				webhook.data.webhookId = subscriptionId;
 				webhook.data.webhookEvents = events;
+				webhook.data.signatureVersion = signatureVersion;
 				Logger.info(
-					`Webhook with URL ${webhook.url}, ID ${subscriptionId} and events ${events} created!`,
+					`Webhook with URL ${webhook.url}, ID ${subscriptionId} and events ${events} created with signature version ${signatureVersion}!`,
 				);
 				return true;
 			},
@@ -254,7 +269,11 @@ export class LimeCrmTrigger implements INodeType {
 				Logger.info(`Deleting webhook with ID: ${webhook.data.webhookId}`, { ...webhook });
 				if (webhook.data.webhookId !== undefined) {
 					try {
-						await deleteSubscription(this, webhook.data.webhookId);
+						await deleteSubscription(
+							this,
+							webhook.data.webhookId,
+							webhook.data.signatureVersion ?? SIGNATURE_VERSION_V1,
+						);
 					} catch {
 						Logger.error(`Failed to delete webhook with ID: ${webhook.data.webhookId}`, {
 							...webhook,
@@ -262,6 +281,7 @@ export class LimeCrmTrigger implements INodeType {
 						return false;
 					}
 					delete webhook.data.webhookId;
+					delete webhook.data.signatureVersion;
 					Logger.info('Webhook deleted successfully', { ...webhook });
 					return true;
 				}
@@ -295,21 +315,35 @@ export class LimeCrmTrigger implements INodeType {
 		Logger.info('Webhook received. Starting webhook processing...', {
 			...webhook.context,
 		});
-		const webhookSecret = await getWebhookSecret(this, LIME_CRM_API_CREDENTIAL_KEY);
+		const webhookSecrets = await getWebhookSecrets(this, LIME_CRM_API_CREDENTIAL_KEY);
 		const requestObject = this.getRequestObject();
 		const headerData = this.getHeaderData();
 		const bodyData = this.getBodyData();
 		const limeSignature = headerData['x-lime-signature'] as string;
+		// Subscriptions registered before version 2 existed sign with version 1
+		const expectedVersion = webhook.data.signatureVersion ?? SIGNATURE_VERSION_V1;
 
 		try {
-			verifyRequest(this.getNode(), limeSignature, webhookSecret, requestObject.rawBody);
+			verifyDelivery(
+				this.getNode(),
+				{
+					signature: limeSignature,
+					deliveryId: headerData['x-lime-delivery-id'] as string | undefined,
+					timestamp: headerData['x-lime-delivery-timestamp'] as string | undefined,
+				},
+				webhookSecrets,
+				requestObject.rawBody,
+				{ expectedVersion, replayCache: deliveryReplayCache },
+			);
 		} catch (error) {
-			const secretFingerprint = webhookSecret
-				? createHash('sha256').update(webhookSecret).digest('hex').slice(0, 16)
-				: '';
+			const secretFingerprint = createHash('sha256')
+				.update(webhookSecrets[0])
+				.digest('hex')
+				.slice(0, 16);
 			const returnData = handleWorkflowError(this.getNode(), {
 				message: error.message,
 				receivedSignature: limeSignature,
+				expectedSignatureVersion: expectedVersion,
 				bodyLength: requestObject.rawBody.length,
 				secretFingerprint,
 			});

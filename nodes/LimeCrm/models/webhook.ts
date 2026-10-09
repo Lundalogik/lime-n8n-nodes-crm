@@ -1,4 +1,5 @@
 import { IDataObject, IHookFunctions, IWebhookFunctions } from 'n8n-workflow';
+import { SignatureVersion } from '../../crypto';
 
 /**
  * Available webhook execution contexts in n8n.
@@ -32,7 +33,10 @@ export interface WebhookContext {
 /**
  * Represent a webhook object.
  *
- * @property data - Arbitrary workflow data associated with this webhook
+ * @property data - Arbitrary workflow data associated with this webhook.
+ * `signatureVersion` is the version the subscription in Lime CRM signs
+ * with, decided when it was created. A subscription registered before
+ * version 2 existed has no value and signs with version 1.
  * @property events - List of events that this webhook is subscribed to
  * @property url - Optional URL of the webhook
  * @property context - Context about the node and workflow that owns the webhook
@@ -42,7 +46,11 @@ export interface WebhookContext {
  * @group Models
  */
 export interface Webhook {
-	data: IDataObject & { webhookId?: string; webhookSecret?: string };
+	data: IDataObject & {
+		webhookId?: string;
+		webhookSecret?: string;
+		signatureVersion?: SignatureVersion;
+	};
 	events: string[];
 	url?: string;
 	context: WebhookContext;
