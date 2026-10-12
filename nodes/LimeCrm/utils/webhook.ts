@@ -1,3 +1,4 @@
+import { NodeOperationError } from 'n8n-workflow';
 import { Webhook, WebhookContext, WebhookFunctions } from '../models';
 
 /**
@@ -13,15 +14,27 @@ import { Webhook, WebhookContext, WebhookFunctions } from '../models';
  * @group Utils
  */
 function getEvents(hookData: WebhookFunctions): string[] {
-	const eventData = hookData.getNodeParameter('events', []) as {
-		event: Array<{
+	const eventData = hookData.getNodeParameter('events', {}) as {
+		event?: Array<{
 			limetype: string;
 			eventType: string;
 		}>;
 	};
-	const eventItems = eventData.event;
+	const eventItems = eventData.event ?? [];
+	if (eventItems.length === 0) {
+		throw new NodeOperationError(
+			hookData.getNode(),
+			'No events configured. Add at least one event with a Limetype and an Event type.',
+		);
+	}
 	const events: string[] = [];
 	for (const eventItem of eventItems) {
+		if (!eventItem.limetype || !eventItem.eventType) {
+			throw new NodeOperationError(
+				hookData.getNode(),
+				'Each event must have both a Limetype and an Event type selected.',
+			);
+		}
 		events.push(`${eventItem.limetype}.${eventItem.eventType}`);
 	}
 	return events;
