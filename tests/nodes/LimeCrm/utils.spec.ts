@@ -237,6 +237,24 @@ describe('webhook', () => {
 				name: 'company-new-1762948800000',
 			});
 		});
+
+		it('throws an informative error when no events are configured', () => {
+			mockHookData.getNodeParameter.mockReturnValue({});
+
+			expect(() => getWebhook(mockHookData)).toThrow(
+				'No events configured. Add at least one event with a Limetype and an Event type.',
+			);
+		});
+
+		it('throws an informative error when an event has no limetype', () => {
+			mockHookData.getNodeParameter.mockReturnValue({
+				event: [{ limetype: '', eventType: 'new' }],
+			});
+
+			expect(() => getWebhook(mockHookData)).toThrow(
+				'Each event must have both a Limetype and an Event type selected.',
+			);
+		});
 	});
 });
 
