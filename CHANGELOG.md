@@ -1,3 +1,10 @@
+## [1.0.3](https://github.com/Lundalogik/lime-n8n-nodes-crm/compare/v1.0.2...v1.0.3) (2026-10-13)
+
+
+### Bug Fixes
+
+* **trigger:** show a clear error when no events are configured ([6c71a43](https://github.com/Lundalogik/lime-n8n-nodes-crm/commit/6c71a43aad594459c5dbabe6ad03bb0d7759d48f))
+
 ## [1.0.2](https://github.com/Lundalogik/lime-n8n-nodes-crm/compare/v1.0.1...v1.0.2) (2026-09-25)
 
 
