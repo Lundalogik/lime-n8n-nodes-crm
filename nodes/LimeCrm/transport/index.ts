@@ -28,6 +28,7 @@ export {
 } from './limetypes';
 export {
 	ApiResponseWebhook,
+	CreatedSubscription,
 	createSubscription,
 	deleteSubscription,
 	getSubscription,

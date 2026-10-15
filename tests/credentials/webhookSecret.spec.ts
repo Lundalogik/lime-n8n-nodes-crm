@@ -18,3 +18,20 @@ describe.each([['LimeCrmApi', new LimeCrmApi()]])(
 		});
 	},
 );
+
+describe.each([['LimeCrmApi', new LimeCrmApi()]])(
+	'%s credential previous webhook secret field',
+	(_name, credential) => {
+		const field = credential.properties.find(
+			(property) => property.name === 'previousWebhookSecret',
+		);
+
+		it('is an optional, masked string field', () => {
+			expect(field).toBeDefined();
+			expect(field!.type).toBe('string');
+			expect(field!.required).toBeUndefined();
+			expect(field!.typeOptions?.password).toBe(true);
+			expect(field!.default).toBe('');
+		});
+	},
+);
