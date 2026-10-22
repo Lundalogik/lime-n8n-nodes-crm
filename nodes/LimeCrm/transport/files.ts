@@ -1,4 +1,4 @@
-import { IExecuteFunctions, IBinaryData, BINARY_ENCODING } from 'n8n-workflow';
+import { IExecuteFunctions, IBinaryData } from 'n8n-workflow';
 import { callLimeApi, prepareResponseWithoutKeys } from './commons';
 import { getLimeobject } from './limeobjects';
 import { getFilenameFromHeader, handleWorkflowError, setFilename } from '../utils';
@@ -189,11 +189,12 @@ export async function getFileContentByLimetype(
 }
 
 /**
- * Create a file in Lime CRM using binary data.
+ * Create a file in Lime CRM.
  *
  * @param nodeContext - n8n execution context
- * @param binary - The binary data to upload
- * @param fallbackFileName - File name to use if `binary.fileName` is missing
+ * @param content - The file content, read with `getBinaryDataBuffer`
+ * @param fileName - Name of the file
+ * @param mimeType - MIME type of the file
  * @returns Created file metadata
  *
  * @public
@@ -201,17 +202,18 @@ export async function getFileContentByLimetype(
  */
 export async function createFile(
 	nodeContext: IExecuteFunctions,
-	binary: IBinaryData,
-	fallbackFileName: string,
+	content: Buffer,
+	fileName: string,
+	mimeType: string,
 ): Promise<APIResponse<FileMetadata>> {
 	const response = await callLimeApi<FileMetadata>(nodeContext, {
 		method: 'POST',
 		url: LIME_FILE_URL,
 		requestOptions: {
-			body: Buffer.from(binary.data, BINARY_ENCODING),
+			body: content,
 			headers: {
-				'Content-Disposition': `;filename*="UTF-8''${encodeURIComponent(binary.fileName || fallbackFileName)}"`,
-				'Content-Type': binary.mimeType,
+				'Content-Disposition': `;filename*="UTF-8''${encodeURIComponent(fileName)}"`,
+				'Content-Type': mimeType,
 			},
 		},
 	});

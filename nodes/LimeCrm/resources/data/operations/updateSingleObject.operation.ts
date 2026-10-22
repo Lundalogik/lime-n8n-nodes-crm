@@ -219,7 +219,11 @@ export async function execute(
 
 	const fileProperties = getFilePropertiesNames(properties);
 
-	await setFileProperties(this, i, fileProperties, body);
+	const setFilePropertiesResponse = await setFileProperties(this, i, fileProperties, body);
+	if (!setFilePropertiesResponse.success)
+		return {
+			json: setFilePropertiesResponse.data,
+		};
 
 	const updateLimeobjectResponse = await updateLimeobject(this, limetype, id, body);
 	if (!updateLimeobjectResponse.success)

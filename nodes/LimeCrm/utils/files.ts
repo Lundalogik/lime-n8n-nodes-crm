@@ -87,8 +87,12 @@ export function getFilePropertiesNames(
 
 /**
  * Iterate through all file properties, checks whether
- * the corresponding values represent valid binary data, and uploads them.
+ * the corresponding values name binary properties of the input item, and uploads them.
  * When a file is successfully uploaded, its property value is replaced with the returned file ID.
+ *
+ * Values that are empty or look like an existing Lime file ID (an integer) are sent as they are.
+ * Any other value that does not name a binary property of the item is an error, so a typo in
+ * the binary property name never reaches Lime CRM as a file ID.
  *
  * @param context - The n8n node execution context
  * @param i - The index of the current item being processed
@@ -109,12 +113,13 @@ export async function setFileProperties(
 ): Promise<APIResponse<IDataObject>> {
 	for (const fileProperty of fileProperties) {
 		if (!(fileProperty in definedProperties)) continue;
+		const binaryPropertyName = definedProperties[fileProperty] as string;
 		let binaryData: IBinaryData;
 		try {
 			Logger.info(
 				`Checking whether "${definedProperties[fileProperty]}" is a valid binary object for property "${fileProperty}"...`,
 			);
-			binaryData = context.helpers.assertBinaryData(i, definedProperties[fileProperty] as string);
+			binaryData = context.helpers.assertBinaryData(i, binaryPropertyName);
 		} catch {
 			Logger.info(
 				`Invalid or missing binary data for "${fileProperty}". Using original value instead.`,
@@ -122,10 +127,13 @@ export async function setFileProperties(
 			continue;
 		}
 
+		const content = await context.helpers.getBinaryDataBuffer(i, binaryPropertyName);
+
 		const response = await createFile(
 			context,
-			binaryData,
-			definedProperties[fileProperty] as string,
+			content,
+			binaryData.fileName || binaryPropertyName,
+			binaryData.mimeType,
 		);
 
 		if (response.success) {

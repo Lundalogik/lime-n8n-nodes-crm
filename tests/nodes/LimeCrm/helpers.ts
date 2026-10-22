@@ -49,7 +49,7 @@ export function makeNodeExecuteContext(
 				}
 				return overrides.binaryData;
 			}),
-			getBinaryDataBuffer: jest.fn(),
+			getBinaryDataBuffer: jest.fn(async () => Buffer.from('binary')),
 			// Minimal stand-in for n8n's binary data helper: wraps a buffer
 			// without a fileName, so setFilename falls back to the
 			// response-derived name.
