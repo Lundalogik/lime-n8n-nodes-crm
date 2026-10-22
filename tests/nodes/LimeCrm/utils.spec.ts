@@ -114,45 +114,62 @@ describe('files', () => {
 
 	describe('setFileProperties', () => {
 		const assertBinaryData = jest.fn();
-		const mockContext = { helpers: { assertBinaryData } } as unknown as IExecuteFunctions;
-		const mockBinaryData = { data: 'some binary data' };
+		const getBinaryDataBuffer = jest.fn();
+		const mockContext = {
+			helpers: { assertBinaryData, getBinaryDataBuffer },
+			getNode: jest.fn(() => ({ name: 'Test', onError: 'stopWorkflow' })),
+		} as unknown as IExecuteFunctions;
+		const mockBinaryData = {
+			data: 'filesystem-v2',
+			fileName: 'cv.pdf',
+			mimeType: 'application/pdf',
+		};
+		const content = Buffer.from('file-bytes');
 
 		beforeEach(() => {
 			(createFile as jest.Mock).mockClear();
-			assertBinaryData.mockClear();
+			assertBinaryData.mockReset();
+			getBinaryDataBuffer.mockReset();
+			getBinaryDataBuffer.mockResolvedValue(content);
 		});
 
-		it('sets file properties successfully', async () => {
+		it('uploads the content read through getBinaryDataBuffer', async () => {
 			assertBinaryData.mockReturnValue(mockBinaryData);
 
-			const definedProperties = { document: 'some binary data' };
+			const definedProperties = { document: 'data' };
 			const result = await setFileProperties(
 				mockContext,
 				0,
 				new Set(['document']),
 				definedProperties,
 			);
+			expect(getBinaryDataBuffer).toHaveBeenCalledWith(0, 'data');
+			expect(createFile).toHaveBeenCalledWith(mockContext, content, 'cv.pdf', 'application/pdf');
 			expect(result.success).toBe(true);
 			if (result.success) {
 				expect(result.data.document).toBe(1);
 			}
 		});
 
-		it('sets file ID if assertBinaryData throws an error', async () => {
+		it('names the file after the binary property when the binary has no file name', async () => {
+			assertBinaryData.mockReturnValue({ ...mockBinaryData, fileName: undefined });
+
+			await setFileProperties(mockContext, 0, new Set(['document']), { document: 'data' });
+
+			expect(createFile).toHaveBeenCalledWith(mockContext, content, 'data', 'application/pdf');
+		});
+
+		it('keeps the original value when it names no binary data', async () => {
 			assertBinaryData.mockImplementation(() => {
 				throw new Error('Invalid binary data');
 			});
-			const definedProperties = { document: 2 };
-			const result = await setFileProperties(
-				mockContext,
-				0,
-				new Set(['document']),
-				definedProperties,
-			);
-			expect(result.success).toBe(true);
-			if (result.success) {
-				expect(result.data.document).toBe(2);
-			}
+
+			const result = await setFileProperties(mockContext, 0, new Set(['document']), {
+				document: 2,
+			});
+
+			expect(createFile).not.toHaveBeenCalled();
+			expect(result).toEqual({ success: true, data: { document: 2 } });
 		});
 	});
 

@@ -146,16 +146,12 @@ describe('getFileContentByLimetype', () => {
 });
 
 describe('createFile', () => {
-	const binary = {
-		data: Buffer.from('file-bytes').toString('base64'),
-		mimeType: 'application/pdf',
-		fileName: 'årsrapport.pdf',
-	} as IBinaryData;
+	const content = Buffer.from('file-bytes');
 
-	it('uploads the binary with an RFC 5987 encoded filename', async () => {
+	it('uploads the content with an RFC 5987 encoded filename', async () => {
 		callLimeApiMock.mockResolvedValue(ok({ id: 9, filename: 'årsrapport.pdf', _links: {} }));
 
-		const response = await createFile(ctx, binary, 'fallback.pdf');
+		const response = await createFile(ctx, content, 'årsrapport.pdf', 'application/pdf');
 
 		expect(callLimeApiMock).toHaveBeenCalledWith(ctx, {
 			method: 'POST',
@@ -171,15 +167,6 @@ describe('createFile', () => {
 		expect(response).toEqual(ok({ id: 9, filename: 'årsrapport.pdf' }));
 	});
 
-	it('uses the fallback filename when the binary has none', async () => {
-		callLimeApiMock.mockResolvedValue(ok({ id: 9 }));
-
-		await createFile(ctx, { ...binary, fileName: undefined }, 'prop.pdf');
-
-		const headers = callLimeApiMock.mock.calls[0][1].requestOptions.headers;
-		expect(headers['Content-Disposition']).toBe(`;filename*="UTF-8''prop.pdf"`);
-	});
-
 	it('passes a failed upload response through unchanged', async () => {
 		callLimeApiMock.mockResolvedValue({
 			success: false,
@@ -192,7 +179,7 @@ describe('createFile', () => {
 			},
 		});
 
-		const response = await createFile(ctx, binary, 'fallback.pdf');
+		const response = await createFile(ctx, content, 'årsrapport.pdf', 'application/pdf');
 
 		expect(response).toEqual({
 			success: false,
