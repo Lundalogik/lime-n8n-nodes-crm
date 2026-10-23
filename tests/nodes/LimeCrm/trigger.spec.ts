@@ -60,6 +60,34 @@ describe('LimeCrmTrigger webhook secret handling', () => {
 			expect(staticData.webhookSecret).toBeUndefined();
 		});
 
+		it('registers with the second secret when it is the active one', async () => {
+			const secondSecret = 'b'.repeat(64);
+			const httpRequestWithAuthentication = jest
+				.fn()
+				.mockImplementation((_credentials: string, options: { method: string }) =>
+					options.method === 'GET' ? [] : { id: 'sub-1', events: ['deal.new'] },
+				);
+
+			const loader = buildLoader({
+				getCredentials: jest.fn().mockResolvedValue({
+					url: 'https://api.example.com',
+					webhookSecret: credentialSecret,
+					secondWebhookSecret: secondSecret,
+					activeWebhookSecretId: 'secondWebhookSecret',
+				}),
+				getWorkflowStaticData: jest.fn().mockReturnValue({}),
+				helpers: { httpRequestWithAuthentication },
+			});
+
+			const trigger = new LimeCrmTrigger();
+			await trigger.webhookMethods.default.create.call(loader as never);
+
+			const createCall = httpRequestWithAuthentication.mock.calls.find(
+				(call) => call[1].method === 'POST',
+			);
+			expect((createCall![1].body as { secret: string }).secret).toBe(secondSecret);
+		});
+
 		it('registers through the v2 API and remembers the signature version', async () => {
 			const staticData: Record<string, unknown> = {};
 			const httpRequestWithAuthentication = jest
@@ -385,9 +413,9 @@ describe('LimeCrmTrigger webhook secret handling', () => {
 			);
 		});
 
-		it('accepts a delivery signed with the previous secret during a rotation', async () => {
-			const previousSecret = 'b'.repeat(64);
-			const headers = buildV2Request(previousSecret);
+		it('accepts a delivery signed with the inactive secret during a rotation', async () => {
+			const secondSecret = 'b'.repeat(64);
+			const headers = buildV2Request(secondSecret);
 			const trigger = new LimeCrmTrigger();
 
 			const response = await trigger.webhook.call(
@@ -395,7 +423,7 @@ describe('LimeCrmTrigger webhook secret handling', () => {
 					getCredentials: jest.fn().mockResolvedValue({
 						url: 'https://api.example.com',
 						webhookSecret: credentialSecret,
-						previousWebhookSecret: previousSecret,
+						secondWebhookSecret: secondSecret,
 					}),
 				}) as never,
 			);
