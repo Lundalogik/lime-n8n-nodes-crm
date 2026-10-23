@@ -72,9 +72,37 @@ export class LimeCrmApi implements ICredentialType {
 			description:
 				'Secret used to sign and verify webhook calls from Lime CRM. ' +
 				'Required only when using the Lime CRM Trigger node. ' +
-				'Use a strong random value of at least 32 characters. ' +
-				'Workflows with a Lime CRM Trigger must be re-activated ' +
-				'after changing it.',
+				'Use a strong random value of at least 32 characters.',
+		},
+		{
+			displayName: 'Second Webhook Secret',
+			name: 'secondWebhookSecret',
+			type: 'string',
+			typeOptions: {
+				password: true,
+			},
+			default: '',
+			description:
+				'A second secret, used to change the Webhook Secret without ' +
+				'breaking active workflows. Webhook calls signed with either ' +
+				'secret are accepted. To rotate, fill in the empty field with ' +
+				'a new value, select it under Active Webhook Secret, ' +
+				're-activate workflows with a Lime CRM Trigger, then clear ' +
+				'the other field.',
+		},
+		{
+			displayName: 'Active Webhook Secret',
+			name: 'activeWebhookSecretId',
+			type: 'options',
+			options: [
+				{ name: 'Webhook Secret', value: 'webhookSecret' },
+				{ name: 'Second Webhook Secret', value: 'secondWebhookSecret' },
+			],
+			default: 'webhookSecret',
+			description:
+				'The secret new subscriptions are registered with. A ' +
+				'subscription keeps the secret it was registered with until ' +
+				'its workflow is re-activated.',
 		},
 	];
 
