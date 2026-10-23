@@ -1,3 +1,10 @@
+## [1.0.4](https://github.com/Lundalogik/lime-n8n-nodes-crm/compare/v1.0.3...v1.0.4) (2026-10-23)
+
+
+### Bug Fixes
+
+* fix file update ([cf71063](https://github.com/Lundalogik/lime-n8n-nodes-crm/commit/cf7106384baea5a947a9d44742b1d252a7e2a6b8))
+
 ## [1.0.3](https://github.com/Lundalogik/lime-n8n-nodes-crm/compare/v1.0.2...v1.0.3) (2026-10-13)
 
 
