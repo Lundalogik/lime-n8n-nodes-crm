@@ -20,11 +20,9 @@ describe.each([['LimeCrmApi', new LimeCrmApi()]])(
 );
 
 describe.each([['LimeCrmApi', new LimeCrmApi()]])(
-	'%s credential previous webhook secret field',
+	'%s credential second webhook secret field',
 	(_name, credential) => {
-		const field = credential.properties.find(
-			(property) => property.name === 'previousWebhookSecret',
-		);
+		const field = credential.properties.find((property) => property.name === 'secondWebhookSecret');
 
 		it('is an optional, masked string field', () => {
 			expect(field).toBeDefined();
@@ -32,6 +30,25 @@ describe.each([['LimeCrmApi', new LimeCrmApi()]])(
 			expect(field!.required).toBeUndefined();
 			expect(field!.typeOptions?.password).toBe(true);
 			expect(field!.default).toBe('');
+		});
+	},
+);
+
+describe.each([['LimeCrmApi', new LimeCrmApi()]])(
+	'%s credential active webhook secret field',
+	(_name, credential) => {
+		const field = credential.properties.find(
+			(property) => property.name === 'activeWebhookSecretId',
+		);
+
+		it('selects one of the two secret fields, the original one by default', () => {
+			expect(field).toBeDefined();
+			expect(field!.type).toBe('options');
+			expect(field!.default).toBe('webhookSecret');
+			expect(field!.options?.map((option) => (option as { value: string }).value)).toEqual([
+				'webhookSecret',
+				'secondWebhookSecret',
+			]);
 		});
 	},
 );

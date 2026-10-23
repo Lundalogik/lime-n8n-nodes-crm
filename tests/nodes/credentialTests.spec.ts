@@ -32,6 +32,21 @@ describe.each([['limeCrmApiTest', limeCrmApiTest, '/api/v1/']])(
 			expect(request).not.toHaveBeenCalled();
 		});
 
+		it('reports an error when the second webhook secret is set but too short', async () => {
+			const request = jest.fn();
+
+			const result = await credentialTest.call(
+				buildContext(request),
+				buildCredential({ webhookSecret: 'a'.repeat(64), secondWebhookSecret: 'short-secret' }),
+			);
+
+			expect(result).toMatchObject({
+				status: 'Error',
+				message: expect.stringContaining('The Second Webhook Secret is shorter than'),
+			});
+			expect(request).not.toHaveBeenCalled();
+		});
+
 		it.each([[{}], [{ webhookSecret: '' }]])(
 			'accepts a missing or empty webhook secret (%o)',
 			async (data) => {

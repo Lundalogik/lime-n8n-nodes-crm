@@ -72,24 +72,37 @@ export class LimeCrmApi implements ICredentialType {
 			description:
 				'Secret used to sign and verify webhook calls from Lime CRM. ' +
 				'Required only when using the Lime CRM Trigger node. ' +
-				'Use a strong random value of at least 32 characters. ' +
-				'When changing it, move the old value to Previous Webhook ' +
-				'Secret and re-activate workflows with a Lime CRM Trigger ' +
-				'so their subscriptions sign with the new one.',
+				'Use a strong random value of at least 32 characters.',
 		},
 		{
-			displayName: 'Previous Webhook Secret',
-			name: 'previousWebhookSecret',
+			displayName: 'Second Webhook Secret',
+			name: 'secondWebhookSecret',
 			type: 'string',
 			typeOptions: {
 				password: true,
 			},
 			default: '',
 			description:
-				'The Webhook Secret in use before it was last changed. ' +
-				'Webhook calls signed with it are still accepted, so ' +
-				'workflows keep running until each one has been ' +
-				're-activated. Clear it once no workflow signs with it.',
+				'A second secret, used to change the Webhook Secret without ' +
+				'breaking active workflows. Webhook calls signed with either ' +
+				'secret are accepted. To rotate, fill in the empty field with ' +
+				'a new value, select it under Active Webhook Secret, ' +
+				're-activate workflows with a Lime CRM Trigger, then clear ' +
+				'the other field.',
+		},
+		{
+			displayName: 'Active Webhook Secret',
+			name: 'activeWebhookSecretId',
+			type: 'options',
+			options: [
+				{ name: 'Webhook Secret', value: 'webhookSecret' },
+				{ name: 'Second Webhook Secret', value: 'secondWebhookSecret' },
+			],
+			default: 'webhookSecret',
+			description:
+				'The secret new subscriptions are registered with. A ' +
+				'subscription keeps the secret it was registered with until ' +
+				'its workflow is re-activated.',
 		},
 	];
 
