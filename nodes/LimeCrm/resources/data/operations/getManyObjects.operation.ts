@@ -17,7 +17,7 @@ export const description = {
 };
 
 /**
- * Maximum number of objects to fetch in a single API request.
+ * Default maximum number of objects to fetch in a single API request.
  * @internal
  */
 const BATCHSIZE = 200;
@@ -342,6 +342,32 @@ export const properties: INodeProperties[] = [
 			},
 		},
 	},
+	{
+		displayName: 'Options',
+		name: 'options',
+		type: 'collection',
+		placeholder: 'Add option',
+		default: {},
+		displayOptions: {
+			show: {
+				resource: [DATA_RESOURCE],
+				operation: ['getManyObjects'],
+			},
+		},
+		options: [
+			{
+				displayName: 'Batch Size',
+				name: 'batchSize',
+				type: 'number',
+				default: BATCHSIZE,
+				typeOptions: {
+					minValue: 1,
+				},
+				description:
+					'This node splits the fetching into several requests to help avoid timeouts. This sets the maximum number of objects to fetch in a single request to Lime CRM. Every request re-runs the whole query, so a larger batch size makes large result sets faster to fetch, but each request becomes heavier for the Lime CRM server and more likely to time out. The more data you fetch per object, the heavier each request is.',
+			},
+		],
+	},
 ];
 
 /**
@@ -416,7 +442,7 @@ function getOrderBy(orderByCollection: OrderByCollection) {
  *
  * @remarks
  * This function retrieves objects from Lime CRM for a given limetype by performing
- * multiple sequential API calls, each fetching up to BATCHSIZE records.
+ * multiple sequential API calls, each fetching up to `batchSize` records.
  *
  * @param limetype - The type of Lime CRM entity to fetch
  * @param responseFormat - The format in which objects should be returned, defining which properties are included
@@ -424,6 +450,7 @@ function getOrderBy(orderByCollection: OrderByCollection) {
  * @param limit - Maximum number of objects to fetch in this request
  * @param orderBy - Array of objects defining the sorting of the results
  * @param offset - Starting offset for fetching. Defaults to 0, which preserves automatic pagination from the beginning.
+ * @param batchSize - Maximum number of objects to fetch in a single API request.
  *
  * @returns Array of fetched objects or an error response as an array.
  */
@@ -435,6 +462,7 @@ async function fetchLimeObjects(
 	limit: number | null,
 	orderBy: Record<string, 'ASC' | 'DESC'>[],
 	offset = 0,
+	batchSize = BATCHSIZE,
 ): Promise<WorkflowResponse<IncludedProperties[]>> {
 	const allResults: IncludedProperties[] = [];
 	const parsedFilter = JSON.parse(filter);
@@ -446,7 +474,7 @@ async function fetchLimeObjects(
 
 	while (fetched < targetLimit) {
 		const currentLimit =
-			targetLimit === Infinity ? BATCHSIZE : Math.min(BATCHSIZE, targetLimit - fetched);
+			targetLimit === Infinity ? batchSize : Math.min(batchSize, targetLimit - fetched);
 
 		const q = JSON.stringify({
 			limetype,
@@ -503,6 +531,8 @@ export async function execute(this: IExecuteFunctions, i: number) {
 	const filter = this.getNodeParameter('filter', i) as string;
 	const limit = this.getNodeParameter('limit', i, DEFAULT_API_OBJECT_LIMIT) as number;
 	const offset = (this.getNodeParameter('offset', i, 0) as number) || 0;
+	const options = this.getNodeParameter('options', i, {}) as { batchSize?: number };
+	const batchSize = options.batchSize || BATCHSIZE;
 
 	let response;
 	if (responseFormatInputMethod === 'fields') {
@@ -529,5 +559,14 @@ export async function execute(this: IExecuteFunctions, i: number) {
 		orderBy = DEFAULT_ORDER_BY;
 	}
 
-	return await fetchLimeObjects.call(this, limetype, response, filter, limit, orderBy, offset);
+	return await fetchLimeObjects.call(
+		this,
+		limetype,
+		response,
+		filter,
+		limit,
+		orderBy,
+		offset,
+		batchSize,
+	);
 }

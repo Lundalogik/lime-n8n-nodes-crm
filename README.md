@@ -62,6 +62,7 @@ Requires n8n with `n8n-workflow` 2.9 or later. Node.js 24 is used for local deve
    ```
 
 5. Optionally set **Limit** (default 50, `0` returns all objects) and **Order By**.
+6. Optionally add **Batch Size** under **Options** (default 200), the number of objects fetched per request. A larger value fetches large result sets faster, but each request is heavier for the Lime CRM server.
 
 The node outputs one item per matching object. Each item includes `_id`, which you can pass to **Update an Object** or **Delete an Object** in a later step. **Create an Object** and **Update an Object** take their values through **Input**, either as a **Form** mapped to the limetype's properties or as a **JSON Object**.
 

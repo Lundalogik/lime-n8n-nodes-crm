@@ -57,8 +57,93 @@ function orderByOfCall(callIndex: number): unknown {
 	return JSON.parse(q).orderBy;
 }
 
+// Read the limit value out of the q string passed to queryLimeobjects.
+function limitOfCall(callIndex: number): number {
+	const q = mockedQuery.mock.calls[callIndex][1] as string;
+	return JSON.parse(q).limit;
+}
+
 beforeEach(() => {
 	mockedQuery.mockReset();
+});
+
+describe('getManyObjects batch size parameter', () => {
+	it('requests 200 objects per page when batch size is not set', async () => {
+		respondWith([200, 200, 100]);
+		const context = makeContext({ ...baseParams, limit: 500, offset: '' });
+
+		await execute.call(context, 0);
+
+		expect(mockedQuery).toHaveBeenCalledTimes(3);
+		expect(limitOfCall(0)).toBe(200);
+		expect(limitOfCall(1)).toBe(200);
+		expect(limitOfCall(2)).toBe(100);
+	});
+
+	it('requests 200 objects per page when batch size is left empty', async () => {
+		respondWith([200, 100]);
+		const context = makeContext({
+			...baseParams,
+			limit: 300,
+			offset: '',
+			options: { batchSize: '' },
+		});
+
+		await execute.call(context, 0);
+
+		expect(limitOfCall(0)).toBe(200);
+		expect(limitOfCall(1)).toBe(100);
+	});
+
+	it('requests the provided batch size per page', async () => {
+		respondWith([1000, 1000, 1000]);
+		const context = makeContext({
+			...baseParams,
+			limit: 3000,
+			offset: '',
+			options: { batchSize: 1000 },
+		});
+
+		const result = await execute.call(context, 0);
+
+		expect(mockedQuery).toHaveBeenCalledTimes(3);
+		expect(limitOfCall(0)).toBe(1000);
+		expect(offsetOfCall(1)).toBe(1000);
+		expect(offsetOfCall(2)).toBe(2000);
+		expect((result as unknown[]).length).toBe(3000);
+	});
+
+	it('uses the provided batch size when the limit is unlimited', async () => {
+		respondWith([1000, 400]);
+		const context = makeContext({
+			...baseParams,
+			limit: 0,
+			offset: '',
+			options: { batchSize: 1000 },
+		});
+
+		const result = await execute.call(context, 0);
+
+		expect(mockedQuery).toHaveBeenCalledTimes(2);
+		expect(limitOfCall(0)).toBe(1000);
+		expect(limitOfCall(1)).toBe(1000);
+		expect((result as unknown[]).length).toBe(1400);
+	});
+
+	it('requests only the limit when it is smaller than the batch size', async () => {
+		respondWith([50]);
+		const context = makeContext({
+			...baseParams,
+			limit: 50,
+			offset: '',
+			options: { batchSize: 1000 },
+		});
+
+		await execute.call(context, 0);
+
+		expect(mockedQuery).toHaveBeenCalledTimes(1);
+		expect(limitOfCall(0)).toBe(50);
+	});
 });
 
 describe('getManyObjects offset parameter', () => {
