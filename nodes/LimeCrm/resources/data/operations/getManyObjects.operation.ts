@@ -1,4 +1,4 @@
-import { IExecuteFunctions, INodeProperties } from 'n8n-workflow';
+import { IExecuteFunctions, INode, INodeProperties, NodeOperationError } from 'n8n-workflow';
 
 import { IncludedProperties, queryLimeobjects } from '../../../transport';
 import { DATA_RESOURCE, DEFAULT_API_OBJECT_LIMIT } from '../../../models';
@@ -239,6 +239,9 @@ export const properties: INodeProperties[] = [
 		name: 'offset',
 		type: 'number',
 		default: '',
+		typeOptions: {
+			minValue: 0,
+		},
 		placeholder: 'e.g. 200',
 		description:
 			'Use together with Limit to manually control pagination when fetching data in batches. This is useful when the number of records exceeds tens of thousands and you want to keep each workflow iteration lightweight. Leave empty to fetch all objects at once, using automatic pagination under the hood.',
@@ -369,6 +372,73 @@ export const properties: INodeProperties[] = [
 		],
 	},
 ];
+
+/**
+ * The value of a number parameter: a number, or empty when it is not set.
+ * @internal
+ */
+type NumberParameterValue = number | '' | null | undefined;
+
+/**
+ * Return the value of a number parameter, or a default when it is empty.
+ *
+ * @param value - The parameter value
+ * @param fallback - The value to use when the parameter is empty
+ * @returns The parameter value, or `fallback` when it is empty
+ *
+ * @internal
+ */
+function numberOrDefault(value: NumberParameterValue, fallback: number): number {
+	if (value === undefined || value === null || value === '') {
+		return fallback;
+	}
+	return value;
+}
+
+/**
+ * Rules for validating an integer parameter with {@link validateIntegerParameter}.
+ *
+ * @property label - The parameter's display name, used in the error message
+ * @property min - The smallest allowed value
+ *
+ * @internal
+ */
+interface IntegerParameterRules {
+	label: string;
+	min: number;
+}
+
+/**
+ * Check that a number parameter is an integer in the allowed range.
+ *
+ * @remarks
+ * The editor only checks values typed into the field, so a value from an expression can
+ * still be a decimal or out of range. Such values stop the node with a clear error instead
+ * of being sent to the Query API.
+ *
+ * @param node - The node that reads the parameter, used in the error
+ * @param itemIndex - The index of the current item in the workflow execution
+ * @param value - The parameter value
+ * @param rules - The allowed range and the name to use in the error
+ * @throws NodeOperationError if the value is not an integer in the allowed range
+ *
+ * @internal
+ */
+function validateIntegerParameter(
+	node: INode,
+	itemIndex: number,
+	value: number,
+	rules: IntegerParameterRules,
+): void {
+	const tooSmall = value < rules.min;
+	if (!Number.isInteger(value) || tooSmall) {
+		throw new NodeOperationError(
+			node,
+			`${rules.label} must be a whole number of ${rules.min} or more, got "${String(value)}"`,
+			{ itemIndex },
+		);
+	}
+}
 
 /**
  * Create the response format object when using 'fields' mode.
@@ -529,10 +599,27 @@ export async function execute(this: IExecuteFunctions, i: number) {
 	const responseFormatInputMethod = this.getNodeParameter('responseFormatInputMethod', i) as string;
 	const orderByInputMethod = this.getNodeParameter('orderByInputMethod', i) as string;
 	const filter = this.getNodeParameter('filter', i) as string;
-	const limit = this.getNodeParameter('limit', i, DEFAULT_API_OBJECT_LIMIT) as number;
-	const offset = (this.getNodeParameter('offset', i, 0) as number) || 0;
-	const options = this.getNodeParameter('options', i, {}) as { batchSize?: number };
-	const batchSize = options.batchSize || BATCHSIZE;
+	const options = this.getNodeParameter('options', i, {}) as { batchSize: NumberParameterValue };
+	const limit = numberOrDefault(
+		this.getNodeParameter('limit', i, DEFAULT_API_OBJECT_LIMIT) as NumberParameterValue,
+		0,
+	);
+	const offset = numberOrDefault(this.getNodeParameter('offset', i, 0) as NumberParameterValue, 0);
+	const batchSize = numberOrDefault(options.batchSize, BATCHSIZE);
+
+	const node = this.getNode();
+	validateIntegerParameter(node, i, limit, {
+		label: 'Limit',
+		min: 0,
+	});
+	validateIntegerParameter(node, i, offset, {
+		label: 'Offset',
+		min: 0,
+	});
+	validateIntegerParameter(node, i, batchSize, {
+		label: 'Batch Size',
+		min: 1,
+	});
 
 	let response;
 	if (responseFormatInputMethod === 'fields') {
