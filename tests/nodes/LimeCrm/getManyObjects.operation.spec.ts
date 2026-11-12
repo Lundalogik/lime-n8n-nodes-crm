@@ -51,6 +51,12 @@ function offsetOfCall(callIndex: number): number {
 	return JSON.parse(q).offset;
 }
 
+// Read the orderBy value out of the q string passed to queryLimeobjects.
+function orderByOfCall(callIndex: number): unknown {
+	const q = mockedQuery.mock.calls[callIndex][1] as string;
+	return JSON.parse(q).orderBy;
+}
+
 beforeEach(() => {
 	mockedQuery.mockReset();
 });
@@ -86,5 +92,38 @@ describe('getManyObjects offset parameter', () => {
 		expect(offsetOfCall(1)).toBe(700);
 		expect(offsetOfCall(2)).toBe(900);
 		expect((result as unknown[]).length).toBe(450);
+	});
+});
+
+describe('getManyObjects order by', () => {
+	it.each([
+		['an empty JSON list', { orderByInputMethod: 'json', orderByJson: '[]' }],
+		['a form without fields', { orderByInputMethod: 'fields', orderByProperties: {} }],
+		[
+			'a form whose fields were all removed',
+			{ orderByInputMethod: 'fields', orderByProperties: { orderByFields: [] } },
+		],
+	])('orders by _id ascending when given %s', async (_name, orderParams) => {
+		respondWith([10]);
+		const context = makeContext({ ...baseParams, ...orderParams, limit: 0, offset: 200 });
+
+		await execute.call(context, 0);
+
+		expect(offsetOfCall(0)).toBe(200);
+		expect(orderByOfCall(0)).toEqual([{ _id: 'ASC' }]);
+	});
+
+	it('keeps the order given by the user', async () => {
+		respondWith([10]);
+		const context = makeContext({
+			...baseParams,
+			orderByJson: '[{"name":"DESC"}]',
+			limit: 0,
+			offset: 200,
+		});
+
+		await execute.call(context, 0);
+
+		expect(orderByOfCall(0)).toEqual([{ name: 'DESC' }]);
 	});
 });
