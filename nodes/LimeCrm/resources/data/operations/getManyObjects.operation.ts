@@ -23,6 +23,12 @@ export const description = {
 const BATCHSIZE = 200;
 
 /**
+ * Order used when the user gives none.
+ * @internal
+ */
+const DEFAULT_ORDER_BY: Record<string, 'ASC' | 'DESC'>[] = [{ _id: 'ASC' }];
+
+/**
  * Structure of the response format when querying Lime CRM objects.
  *
  * @remarks
@@ -402,7 +408,7 @@ function getOrderBy(orderByCollection: OrderByCollection) {
 		orderByCollection.orderByFields.map((field) => ({
 			[field.propertyName]: field.sortDirection,
 		}));
-	return orderBy || [{ _id: 'ASC' }];
+	return orderBy || DEFAULT_ORDER_BY;
 }
 
 /**
@@ -516,6 +522,11 @@ export async function execute(this: IExecuteFunctions, i: number) {
 	} else if (orderByInputMethod === 'json') {
 		orderBy = this.getNodeParameter('orderByJson', i) as string;
 		orderBy = JSON.parse(orderBy);
+	}
+
+	// Lime CRM rejects an offset without an order, so paging needs one.
+	if (Array.isArray(orderBy) && orderBy.length === 0) {
+		orderBy = DEFAULT_ORDER_BY;
 	}
 
 	return await fetchLimeObjects.call(this, limetype, response, filter, limit, orderBy, offset);
