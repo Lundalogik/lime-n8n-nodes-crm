@@ -16,6 +16,7 @@ function makeContext(params: Record<string, unknown>): IExecuteFunctions {
 		getNodeParameter: jest.fn((name: string, _i: number, fallback?: unknown) =>
 			name in params ? params[name] : fallback,
 		),
+		getNode: jest.fn(() => ({ name: 'Lime CRM' })),
 	} as unknown as IExecuteFunctions;
 }
 
@@ -144,6 +145,15 @@ describe('getManyObjects batch size parameter', () => {
 		expect(mockedQuery).toHaveBeenCalledTimes(1);
 		expect(limitOfCall(0)).toBe(50);
 	});
+
+	it.each([0, -1, 1.5, '1000', 'abc'])('rejects batch size %p', async (batchSize) => {
+		const context = makeContext({ ...baseParams, limit: 0, offset: '', options: { batchSize } });
+
+		await expect(execute.call(context, 0)).rejects.toThrow(
+			'Batch Size must be a whole number of 1 or more',
+		);
+		expect(mockedQuery).not.toHaveBeenCalled();
+	});
 });
 
 describe('getManyObjects offset parameter', () => {
@@ -177,6 +187,36 @@ describe('getManyObjects offset parameter', () => {
 		expect(offsetOfCall(1)).toBe(1500);
 		expect(offsetOfCall(2)).toBe(2500);
 		expect((result as unknown[]).length).toBe(2050);
+	});
+
+	it.each([-1, 1.5, '200', 'abc'])('rejects offset %p', async (offset) => {
+		const context = makeContext({ ...baseParams, limit: 0, offset });
+
+		await expect(execute.call(context, 0)).rejects.toThrow(
+			'Offset must be a whole number of 0 or more',
+		);
+		expect(mockedQuery).not.toHaveBeenCalled();
+	});
+});
+
+describe('getManyObjects limit parameter', () => {
+	it.each(['', null, 0])('fetches all objects when the limit is %p', async (limit) => {
+		respondWith([1000, 10]);
+		const context = makeContext({ ...baseParams, limit, offset: '' });
+
+		const result = await execute.call(context, 0);
+
+		expect(mockedQuery).toHaveBeenCalledTimes(2);
+		expect((result as unknown[]).length).toBe(1010);
+	});
+
+	it.each([-1, 1.5, '100', 'abc'])('rejects limit %p', async (limit) => {
+		const context = makeContext({ ...baseParams, limit, offset: '' });
+
+		await expect(execute.call(context, 0)).rejects.toThrow(
+			'Limit must be a whole number of 0 or more',
+		);
+		expect(mockedQuery).not.toHaveBeenCalled();
 	});
 });
 
