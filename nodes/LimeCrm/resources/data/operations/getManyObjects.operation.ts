@@ -464,7 +464,7 @@ async function fetchLimeObjects(
 	offset = 0,
 	batchSize = BATCHSIZE,
 ): Promise<WorkflowResponse<IncludedProperties[]>> {
-	const allResults: IncludedProperties[] = [];
+	const pages: IncludedProperties[][] = [];
 	const parsedFilter = JSON.parse(filter);
 	const unlimited = limit === null || limit === 0;
 	const targetLimit = unlimited ? Infinity : limit;
@@ -493,7 +493,7 @@ async function fetchLimeObjects(
 		const collected = batch.objects.length;
 		if (collected === 0) break;
 
-		allResults.push(...batch.objects);
+		pages.push(batch.objects);
 
 		fetched += collected;
 		currentOffset += collected;
@@ -501,7 +501,7 @@ async function fetchLimeObjects(
 		if (collected < currentLimit) break;
 	}
 
-	return allResults;
+	return pages.flat();
 }
 
 /**
