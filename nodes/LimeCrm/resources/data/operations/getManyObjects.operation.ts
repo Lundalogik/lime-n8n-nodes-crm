@@ -20,7 +20,7 @@ export const description = {
  * Default maximum number of objects to fetch in a single API request.
  * @internal
  */
-const BATCHSIZE = 200;
+const BATCHSIZE = 1000;
 
 /**
  * Order used when the user gives none.
