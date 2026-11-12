@@ -68,66 +68,66 @@ beforeEach(() => {
 });
 
 describe('getManyObjects batch size parameter', () => {
-	it('requests 200 objects per page when batch size is not set', async () => {
-		respondWith([200, 200, 100]);
-		const context = makeContext({ ...baseParams, limit: 500, offset: '' });
+	it('requests 1000 objects per page when batch size is not set', async () => {
+		respondWith([1000, 1000, 500]);
+		const context = makeContext({ ...baseParams, limit: 2500, offset: '' });
 
 		await execute.call(context, 0);
 
 		expect(mockedQuery).toHaveBeenCalledTimes(3);
-		expect(limitOfCall(0)).toBe(200);
-		expect(limitOfCall(1)).toBe(200);
-		expect(limitOfCall(2)).toBe(100);
+		expect(limitOfCall(0)).toBe(1000);
+		expect(limitOfCall(1)).toBe(1000);
+		expect(limitOfCall(2)).toBe(500);
 	});
 
-	it('requests 200 objects per page when batch size is left empty', async () => {
-		respondWith([200, 100]);
+	it('requests 1000 objects per page when batch size is left empty', async () => {
+		respondWith([1000, 500]);
 		const context = makeContext({
 			...baseParams,
-			limit: 300,
+			limit: 1500,
 			offset: '',
 			options: { batchSize: '' },
 		});
 
 		await execute.call(context, 0);
 
-		expect(limitOfCall(0)).toBe(200);
-		expect(limitOfCall(1)).toBe(100);
+		expect(limitOfCall(0)).toBe(1000);
+		expect(limitOfCall(1)).toBe(500);
 	});
 
 	it('requests the provided batch size per page', async () => {
-		respondWith([1000, 1000, 1000]);
+		respondWith([500, 500, 500]);
 		const context = makeContext({
 			...baseParams,
-			limit: 3000,
+			limit: 1500,
 			offset: '',
-			options: { batchSize: 1000 },
+			options: { batchSize: 500 },
 		});
 
 		const result = await execute.call(context, 0);
 
 		expect(mockedQuery).toHaveBeenCalledTimes(3);
-		expect(limitOfCall(0)).toBe(1000);
-		expect(offsetOfCall(1)).toBe(1000);
-		expect(offsetOfCall(2)).toBe(2000);
-		expect((result as unknown[]).length).toBe(3000);
+		expect(limitOfCall(0)).toBe(500);
+		expect(offsetOfCall(1)).toBe(500);
+		expect(offsetOfCall(2)).toBe(1000);
+		expect((result as unknown[]).length).toBe(1500);
 	});
 
 	it('uses the provided batch size when the limit is unlimited', async () => {
-		respondWith([1000, 400]);
+		respondWith([500, 400]);
 		const context = makeContext({
 			...baseParams,
 			limit: 0,
 			offset: '',
-			options: { batchSize: 1000 },
+			options: { batchSize: 500 },
 		});
 
 		const result = await execute.call(context, 0);
 
 		expect(mockedQuery).toHaveBeenCalledTimes(2);
-		expect(limitOfCall(0)).toBe(1000);
-		expect(limitOfCall(1)).toBe(1000);
-		expect((result as unknown[]).length).toBe(1400);
+		expect(limitOfCall(0)).toBe(500);
+		expect(limitOfCall(1)).toBe(500);
+		expect((result as unknown[]).length).toBe(900);
 	});
 
 	it('requests only the limit when it is smaller than the batch size', async () => {
@@ -166,17 +166,17 @@ describe('getManyObjects offset parameter', () => {
 	});
 
 	it('auto-paginates forward starting from the provided offset', async () => {
-		// limit 0 = unlimited, batches of 200 until a short batch ends it
-		respondWith([200, 200, 50]);
+		// limit 0 = unlimited, batches of 1000 until a short batch ends it
+		respondWith([1000, 1000, 50]);
 		const context = makeContext({ ...baseParams, limit: 0, offset: 500 });
 
 		const result = await execute.call(context, 0);
 
 		expect(mockedQuery).toHaveBeenCalledTimes(3);
 		expect(offsetOfCall(0)).toBe(500);
-		expect(offsetOfCall(1)).toBe(700);
-		expect(offsetOfCall(2)).toBe(900);
-		expect((result as unknown[]).length).toBe(450);
+		expect(offsetOfCall(1)).toBe(1500);
+		expect(offsetOfCall(2)).toBe(2500);
+		expect((result as unknown[]).length).toBe(2050);
 	});
 });
 
