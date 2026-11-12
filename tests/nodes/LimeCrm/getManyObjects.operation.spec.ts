@@ -146,11 +146,25 @@ describe('getManyObjects batch size parameter', () => {
 		expect(limitOfCall(0)).toBe(50);
 	});
 
-	it.each([0, -1, 1.5, '1000', 'abc'])('rejects batch size %p', async (batchSize) => {
+	it('accepts the maximum batch size', async () => {
+		respondWith([10]);
+		const context = makeContext({
+			...baseParams,
+			limit: 0,
+			offset: '',
+			options: { batchSize: 50000 },
+		});
+
+		await execute.call(context, 0);
+
+		expect(limitOfCall(0)).toBe(50000);
+	});
+
+	it.each([0, -1, 1.5, 50001, '1000', 'abc'])('rejects batch size %p', async (batchSize) => {
 		const context = makeContext({ ...baseParams, limit: 0, offset: '', options: { batchSize } });
 
 		await expect(execute.call(context, 0)).rejects.toThrow(
-			'Batch Size must be a whole number of 1 or more',
+			'Batch Size must be a whole number between 1 and 50000',
 		);
 		expect(mockedQuery).not.toHaveBeenCalled();
 	});

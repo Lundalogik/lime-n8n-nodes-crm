@@ -29,6 +29,12 @@ const BATCHSIZE = 1000;
 const DEFAULT_ORDER_BY: Record<string, 'ASC' | 'DESC'>[] = [{ _id: 'ASC' }];
 
 /**
+ * Largest batch size a workflow author may set.
+ * @internal
+ */
+const MAX_BATCHSIZE = 50000;
+
+/**
  * Structure of the response format when querying Lime CRM objects.
  *
  * @remarks
@@ -365,9 +371,9 @@ export const properties: INodeProperties[] = [
 				default: BATCHSIZE,
 				typeOptions: {
 					minValue: 1,
+					maxValue: MAX_BATCHSIZE,
 				},
-				description:
-					'This node splits the fetching into several requests to help avoid timeouts. This sets the maximum number of objects to fetch in a single request to Lime CRM. Every request re-runs the whole query, so a larger batch size makes large result sets faster to fetch, but each request becomes heavier for the Lime CRM server and more likely to time out. The more data you fetch per object, the heavier each request is.',
+				description: `This node splits the fetching into several requests to help avoid timeouts. This sets the maximum number of objects to fetch in a single request to Lime CRM, at most ${MAX_BATCHSIZE}. Every request re-runs the whole query, so a larger batch size makes large result sets faster to fetch, but each request becomes heavier for the Lime CRM server and more likely to time out. The more data you fetch per object, the heavier each request is.`,
 			},
 		],
 	},
@@ -400,12 +406,14 @@ function numberOrDefault(value: NumberParameterValue, fallback: number): number 
  *
  * @property label - The parameter's display name, used in the error message
  * @property min - The smallest allowed value
+ * @property max - The largest allowed value, if any
  *
  * @internal
  */
 interface IntegerParameterRules {
 	label: string;
 	min: number;
+	max?: number;
 }
 
 /**
@@ -431,10 +439,13 @@ function validateIntegerParameter(
 	rules: IntegerParameterRules,
 ): void {
 	const tooSmall = value < rules.min;
-	if (!Number.isInteger(value) || tooSmall) {
+	const tooLarge = rules.max !== undefined && value > rules.max;
+	if (!Number.isInteger(value) || tooSmall || tooLarge) {
+		const range =
+			rules.max === undefined ? `of ${rules.min} or more` : `between ${rules.min} and ${rules.max}`;
 		throw new NodeOperationError(
 			node,
-			`${rules.label} must be a whole number of ${rules.min} or more, got "${String(value)}"`,
+			`${rules.label} must be a whole number ${range}, got "${String(value)}"`,
 			{ itemIndex },
 		);
 	}
@@ -619,6 +630,7 @@ export async function execute(this: IExecuteFunctions, i: number) {
 	validateIntegerParameter(node, i, batchSize, {
 		label: 'Batch Size',
 		min: 1,
+		max: MAX_BATCHSIZE,
 	});
 
 	let response;
