@@ -17,6 +17,8 @@ updates:
         update-types: ['version-update:semver-major']
 
   - package-ecosystem: 'github-actions'
-    directory: '/'
+    # The second entry covers the local composite actions, which Dependabot
+    # does not scan from the root directory.
+    directories: ['/', '/.github/actions/*']
     schedule:
       interval: 'monthly'
