@@ -1,0 +1,29 @@
+name: Prevent merging fixup commits
+description: Fails if any commit in the pull request starts with fixup!, amend! or squash!
+runs:
+  using: composite
+  steps:
+    - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+      with:
+        script: |
+          const commits = await github.paginate(
+            'GET /repos/{owner}/{repo}/pulls/{pull_number}/commits',
+            {
+              ...context.repo,
+              pull_number: context.issue.number,
+              per_page: 100,
+            },
+          );
+
+          core.debug(`${commits.length} commit(s) in the pull request`);
+          let blockedCommitsCount = 0;
+          for (const { commit: { message }, sha, html_url } of commits) {
+            if (/^(fixup|amend|squash)!/.test(message)) {
+              core.error(`Commit ${sha} is an autosquash commit: ${html_url}`);
+              blockedCommitsCount++;
+            }
+          }
+
+          if (blockedCommitsCount) {
+            core.setFailed(`${blockedCommitsCount} commit(s) need to be squashed!`);
+          }
