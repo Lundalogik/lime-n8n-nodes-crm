@@ -1,3 +1,10 @@
+## [1.0.5](https://github.com/Lundalogik/lime-n8n-nodes-crm/compare/v1.0.4...v1.0.5) (2026-11-13)
+
+
+### Bug Fixes
+
+* **get-many-objects:** fetch all pages when order by is empty ([dd437a6](https://github.com/Lundalogik/lime-n8n-nodes-crm/commit/dd437a640860c46c8d5c5a6c9fae9adbe02e5e01)), closes [#45](https://github.com/Lundalogik/lime-n8n-nodes-crm/issues/45)
+
 ## [1.0.4](https://github.com/Lundalogik/lime-n8n-nodes-crm/compare/v1.0.3...v1.0.4) (2026-10-23)
 
 
