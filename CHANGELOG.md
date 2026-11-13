@@ -1,3 +1,17 @@
+# [1.1.0](https://github.com/Lundalogik/lime-n8n-nodes-crm/compare/v1.0.5...v1.1.0) (2026-11-13)
+
+
+### Features
+
+* **get-many-objects:** add batch size option ([495ee78](https://github.com/Lundalogik/lime-n8n-nodes-crm/commit/495ee78f7665238fe5753b7c1138b8d58864f2ad)), closes [#42](https://github.com/Lundalogik/lime-n8n-nodes-crm/issues/42)
+* **get-many-objects:** limit the batch size to 50000 ([eaf950b](https://github.com/Lundalogik/lime-n8n-nodes-crm/commit/eaf950b34f2535c9007ef0d4d18879e75821ba43))
+* **get-many-objects:** validate limit, offset and batch size ([cb60184](https://github.com/Lundalogik/lime-n8n-nodes-crm/commit/cb60184a9f33ca1973997f4c0a623b67bf589d79))
+
+
+### Performance Improvements
+
+* **get-many-objects:** raise the default batch size to 1000 ([652abab](https://github.com/Lundalogik/lime-n8n-nodes-crm/commit/652abab7261025e9cb120bc730dcb5c4d1f1d095))
+
 ## [1.0.5](https://github.com/Lundalogik/lime-n8n-nodes-crm/compare/v1.0.4...v1.0.5) (2026-11-13)
 
 
