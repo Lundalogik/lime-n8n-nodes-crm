@@ -2,6 +2,8 @@
 
 Thanks for helping improve the Lime CRM nodes for n8n. Pull requests are welcome.
 
+To report a security problem, don't open an issue. Follow the [security policy](SECURITY.md) instead.
+
 ## Before you start
 
 For anything bigger than a small fix, open an issue first and describe what you want to change. That way we can agree on the approach before you spend time on it.

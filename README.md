@@ -95,6 +95,10 @@ npm run knip    # dead code check
 
 See the [contributing guide](CONTRIBUTING.md) before you open a pull request.
 
+## Security
+
+Please don't report security problems in public issues. See the [security policy](SECURITY.md) for how to report them privately.
+
 ## License
 
 [MIT](LICENSE)
