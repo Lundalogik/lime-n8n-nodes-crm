@@ -46,7 +46,7 @@ To use the trigger, also set the optional **Webhook Secret** in the credential; 
 
 ## Compatibility
 
-Requires n8n with `n8n-workflow` 2.9 or later. Node.js 24 is used for local development.
+Requires n8n with `n8n-workflow` 2.9 or later. Local development and CI use the Node.js version from `.nvmrc`.
 
 ## Usage
 
