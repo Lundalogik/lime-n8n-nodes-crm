@@ -15,13 +15,7 @@ type UserLoginType = 'DEFAULT' | 'LIME' | 'LIME_AND_WINDOWS';
  * @group Models
  */
 type UserType =
-	| 'STANDARD'
-	| 'ADMINISTRATION'
-	| 'SERVICE'
-	| 'INTEGRATION'
-	| 'SYNCHRONIZATION'
-	| 'TEST'
-	| 'API';
+	'STANDARD' | 'ADMINISTRATION' | 'SERVICE' | 'INTEGRATION' | 'SYNCHRONIZATION' | 'TEST' | 'API';
 
 /**
  * Representation of a user returned by the Lime CRM API.
