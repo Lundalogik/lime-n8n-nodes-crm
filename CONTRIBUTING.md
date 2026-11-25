@@ -10,7 +10,7 @@ For anything bigger than a small fix, open an issue first and describe what you 
 
 ## Development setup
 
-Fork the repository, clone your fork and add this repository as the `upstream` remote. Use Node.js 24, the version CI uses.
+Fork the repository, clone your fork and add this repository as the `upstream` remote. Use the Node.js version from `.nvmrc`, which CI also uses.
 
 ```bash
 git remote add upstream https://github.com/Lundalogik/lime-n8n-nodes-crm.git
