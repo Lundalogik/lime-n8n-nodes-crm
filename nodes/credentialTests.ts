@@ -5,6 +5,8 @@ import {
 	INodeCredentialTestResult,
 } from 'n8n-workflow';
 
+import { WEBHOOK_SECRET_FIELDS } from './webhookSecret';
+
 /**
  * Minimum accepted length of the webhook secret.
  *
@@ -31,14 +33,14 @@ const stripTrailingSlashes = (url: string): string => {
 };
 
 /**
- * Validate the optional webhook secret of a credential.
+ * Validate the optional webhook secrets of a credential.
  *
- * The secret is only needed by trigger nodes, so an empty field is fine.
+ * The secrets are only needed by trigger nodes, so an empty field is fine.
  * A short value is not blocked anywhere, but it weakens the webhook
  * signatures, so recommend a longer one when the credential is tested.
  *
  * @param data - The decrypted credential data
- * @returns An error result when the secret is set but too short, otherwise `null`.
+ * @returns An error result when a secret is set but too short, otherwise `null`.
  *
  * @internal
  * @group Utils
@@ -46,18 +48,20 @@ const stripTrailingSlashes = (url: string): string => {
 const validateWebhookSecret = (
 	data: ICredentialDataDecryptedObject,
 ): INodeCredentialTestResult | null => {
-	const webhookSecret = data.webhookSecret;
-	if (
-		typeof webhookSecret === 'string' &&
-		webhookSecret !== '' &&
-		webhookSecret.length < MIN_WEBHOOK_SECRET_LENGTH
-	) {
-		return {
-			status: 'Error',
-			message:
-				`The Webhook Secret is shorter than the recommended ` +
-				`${MIN_WEBHOOK_SECRET_LENGTH} characters`,
-		};
+	for (const [field, label] of Object.entries(WEBHOOK_SECRET_FIELDS)) {
+		const webhookSecret = data[field];
+		if (
+			typeof webhookSecret === 'string' &&
+			webhookSecret !== '' &&
+			webhookSecret.length < MIN_WEBHOOK_SECRET_LENGTH
+		) {
+			return {
+				status: 'Error',
+				message:
+					`The ${label} is shorter than the recommended ` +
+					`${MIN_WEBHOOK_SECRET_LENGTH} characters`,
+			};
+		}
 	}
 	return null;
 };
