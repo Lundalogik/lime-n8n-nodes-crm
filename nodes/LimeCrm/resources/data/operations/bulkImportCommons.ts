@@ -17,9 +17,7 @@ import {
 import { parseResourceMapperFields } from '../../../methods';
 
 export type BulkImportOperationName =
-	| 'bulkCreateManyObjects'
-	| 'bulkCreateOrUpdateManyObjects'
-	| 'bulkUpdateManyObjects';
+	'bulkCreateManyObjects' | 'bulkCreateOrUpdateManyObjects' | 'bulkUpdateManyObjects';
 
 /**
  * Generate common properties for bulk import operations.
