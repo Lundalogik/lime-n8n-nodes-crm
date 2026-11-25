@@ -519,11 +519,113 @@ function getOrderBy(orderByCollection: OrderByCollection) {
 }
 
 /**
+ * How to page by `_id` instead of by offset.
+ *
+ * @property op - The filter operator that selects the objects after the last fetched `_id`
+ * @property removeId - Whether `_id` is only requested for paging and must be removed from
+ *   the output
+ *
+ * @internal
+ */
+interface IdPaging {
+	op: '>' | '<';
+	removeId: boolean;
+}
+
+/**
+ * Decide whether the query can be paged by `_id` instead of by offset.
+ *
+ * @remarks
+ * With an offset, Lime CRM has to go through all objects of the earlier pages again for
+ * every page, so later pages get slower. Asking for the objects after the last fetched
+ * `_id` avoids that. This is only possible when the objects are ordered by `_id` alone, no
+ * starting offset is set, `_id` is returned under its own name, and no other property is
+ * returned as `_id`.
+ *
+ * @param orderBy - The order of the objects
+ * @param offset - The starting offset, 0 when not set
+ * @param responseFormat - The response format of the query
+ * @returns How to page by `_id`, or `null` to page by offset
+ *
+ * @internal
+ */
+function getIdPaging(
+	orderBy: Record<string, string>[],
+	offset: number,
+	responseFormat: ResponseFormat,
+): IdPaging | null {
+	if (offset !== 0 || !responseFormat?.object) {
+		return null;
+	}
+	if (!Array.isArray(orderBy) || orderBy.length !== 1) {
+		return null;
+	}
+
+	const entries = Object.entries(orderBy[0]);
+	if (entries.length !== 1 || entries[0][0] !== '_id') {
+		return null;
+	}
+
+	const direction = String(entries[0][1]).toUpperCase();
+	if (direction !== 'ASC' && direction !== 'DESC') {
+		return null;
+	}
+
+	const id: unknown = responseFormat.object._id;
+	if (id !== null && typeof id === 'object') {
+		return null;
+	}
+
+	const otherIsNamedId = Object.entries(responseFormat.object).some(
+		([key, value]) => key !== '_id' && isAliasedTo(value, '_id'),
+	);
+	if (otherIsNamedId) {
+		return null;
+	}
+
+	return { op: direction === 'ASC' ? '>' : '<', removeId: !('_id' in responseFormat.object) };
+}
+
+/**
+ * Check whether a response format value returns its property under the given name.
+ *
+ * @param value - The value of a property in the response format
+ * @param name - The name to look for
+ * @returns `true` if the value has an `_alias` equal to `name`
+ *
+ * @internal
+ */
+function isAliasedTo(value: unknown, name: string): boolean {
+	return (
+		value !== null && typeof value === 'object' && (value as { _alias?: unknown })._alias === name
+	);
+}
+
+/**
+ * Add a condition on `_id` to the user's filter.
+ *
+ * @param filter - The user's filter, `{}` when there is none
+ * @param op - The comparison operator
+ * @param id - The `_id` to compare with
+ * @returns The combined filter
+ *
+ * @internal
+ */
+function addIdCondition(filter: object, op: IdPaging['op'], id: unknown): object {
+	const condition = { key: '_id', op, exp: id };
+	if (!filter || Object.keys(filter).length === 0) {
+		return condition;
+	}
+	return { op: 'AND', exp: [filter, condition] };
+}
+
+/**
  * Fetch Lime CRM objects in batches to handle large result sets or unlimited queries.
  *
  * @remarks
  * This function retrieves objects from Lime CRM for a given limetype by performing
- * multiple sequential API calls, each fetching up to `batchSize` records.
+ * multiple sequential API calls, each fetching up to `batchSize` records. It pages by `_id`
+ * when {@link getIdPaging} allows it, and by offset otherwise.
  *
  * @param limetype - The type of Lime CRM entity to fetch
  * @param responseFormat - The format in which objects should be returned, defining which properties are included
@@ -550,19 +652,30 @@ async function fetchLimeObjects(
 	const unlimited = limit === null || limit === 0;
 	const targetLimit = unlimited ? Infinity : limit;
 
+	const idPaging = getIdPaging(orderBy, offset, responseFormat);
+	const requestFormat = idPaging?.removeId
+		? { ...responseFormat, object: { ...responseFormat.object, _id: '' } }
+		: responseFormat;
+
 	let fetched = 0;
 	let currentOffset = offset;
+	let lastId: unknown = undefined;
 
 	while (fetched < targetLimit) {
 		const currentLimit =
 			targetLimit === Infinity ? batchSize : Math.min(batchSize, targetLimit - fetched);
 
+		const pageFilter =
+			idPaging && lastId !== undefined
+				? addIdCondition(parsedFilter, idPaging.op, lastId)
+				: parsedFilter;
+
 		const q = JSON.stringify({
 			limetype,
-			responseFormat: responseFormat,
-			filter: parsedFilter,
+			responseFormat: requestFormat,
+			filter: pageFilter,
 			limit: currentLimit,
-			offset: currentOffset,
+			offset: idPaging ? 0 : currentOffset,
 			orderBy: orderBy,
 		});
 
@@ -573,6 +686,15 @@ async function fetchLimeObjects(
 
 		const collected = batch.objects.length;
 		if (collected === 0) break;
+
+		if (idPaging) {
+			lastId = batch.objects[collected - 1]._id;
+			if (idPaging.removeId) {
+				for (const object of batch.objects) {
+					delete object._id;
+				}
+			}
+		}
 
 		pages.push(batch.objects);
 
